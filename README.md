@@ -1,4 +1,4 @@
-**VEMF - Vampire's Epoch Mission Framework**
+**Vampire's Epoch Mission Framework**
 ================
 The Spiritual Successor of DZMS, programmed for Arma 3 Epoch.
 
