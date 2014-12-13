@@ -4,7 +4,7 @@ The Spiritual Successor of DZMS, programmed for Arma 3 Epoch.
 
 Current Version is WIP.
 
-If you are interested in helping, please contact me on EpochMod.com.
+If you are interested in helping, please contact me on EpochMod.com.    
 If you want to support me, you can visit my Patreon at:
  > http://www.patreon.com/vampire
 
