@@ -69,4 +69,4 @@ VEMFWorldName = toLower format ["%1", worldName];
 diag_log text format["[VEMF]: Server is Running Map: %1", VEMFWorldName];
 
 // Lets load our functions
-call compile preprocessFileLineNumbers "\VEMF\VFunctions.sqf";
+call compile preprocessFileLineNumbers "\VEMF\Scripts\VFunctions.sqf";
