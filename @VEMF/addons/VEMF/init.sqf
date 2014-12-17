@@ -63,10 +63,7 @@ if (VEMFVersion != "1.0 DEV") then {
 };
 
 diag_log text format ["[VEMF]: Configurations Loaded."];
-
-// Lets get the map name in case we need it
-VEMFWorldName = toLower format ["%1", worldName];
-diag_log text format["[VEMF]: Server is Running Map: %1", VEMFWorldName];
+diag_log text format["[VEMF]: Server is Running Map: %1", (toLower format ["%1", worldName])];
 
 // Lets load our functions
 call compile preprocessFileLineNumbers "\VEMF\Scripts\VFunctions.sqf";
