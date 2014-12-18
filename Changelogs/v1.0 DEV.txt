@@ -1,0 +1,13 @@
+// ===================================================== //
+
+[Added] Initial Code
+[Added] Dynamic Town Invasion
+[Added] VEMF Addon Support (Needs Refined)
+
+[Working On] Temporary Vehicles (Non-Hived)
+[Working On] Permanent Vehicles (Hived)
+
+Thanks to:
+Richie (UKGZ) - Development Server Provider
+
+// ===================================================== //
