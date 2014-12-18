@@ -12,6 +12,13 @@
 // They cannot get a mission assignment earlier than this. Default 10mins.
 VEMFMinTime = 600;
 
+///////////////////////////////////////////////////////////////////
+// Blacklist Zone Array -- missions will not spawn in these areas
+// format: [[x,y,z],radius]
+// Ex: [[06325,07807,0],300] //Starry Sobor
+VEMFBlacklistZones = [
+	[[0,0,0],50]
+];
 
 =============================================
 VEMFVersion = "1.0 DEV";
