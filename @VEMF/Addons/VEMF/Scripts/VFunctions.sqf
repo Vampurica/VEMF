@@ -9,6 +9,7 @@ diag_log text "[VEMF]: Loading ExecVM Functions.";
 
 diag_log text "[VEMF]: Loading Compiled Functions.";
 
+// Gets the Map's Hardcoded CenterPOS and Radius
 VEMFMapCenter = {
 	private ["_mapName","_centerPos","_mapRadii","_fin"];
 	
@@ -57,24 +58,7 @@ VEMFMapCenter = {
 	_fin
 };
 
-VEMFFindTown = {
-	private ["_cntr","_townArr","_sRandomTown","_townPos"];
-	
-	// Map Incorrect Center (but center-ish)
-	// Might be biased towards the center because of this (Needs Testing)
-	_cntr = getArray(configFile >> "CfgWorlds" >> worldName >> "centerPosition")
-
-	// Get a list of towns
-	// Shouldn't cause lag because of the infrequency it runs (Needs Testing)
-	_townArr = nearestLocations [_cntr, ["NameVillage","NameCity","NameCityCapital"], 30000];
-	
-	// Pick a random one, get the POS, return the POS (Coords)
-	_sRandomTown = _townArr call BIS_fnc_selectRandom;
-	_townPos = [((getposATL _sRandomTown) select 0), ((getposATL _sRandomTown) select 1), 0];
-	
-	_townPos
-};
-
+// Finds a Random Map Location for a Mission
 VEMFRandomPos = {
 	private ["_centerLoc","_findRun","_testPos","_hardX","_hardY","_posX","_posY","_feel1","_feel2","_feel3","_feel4","_noWater","_okDis","_isBlack","_plyrNear","_fin"];
 	
@@ -124,7 +108,7 @@ VEMFRandomPos = {
 			};
         } forEach VEMFBlacklistZones;
 		
-		_plyrNear = {isPlayer _x} count (_testPos nearEntities ["CAManBase", 500]) > 0;
+		_plyrNear = {isPlayer _x} count (_testPos nearEntities[["Epoch_Male_F", "Epoch_Female_F"], 500]) > 0;
 		
 		// Let's Compare all our Requirements
 		if ((_posX != _hardX) AND (_posY != _hardY) AND _noWater AND _okDis AND !_isBlack AND !_plyrNear) then {
@@ -140,15 +124,91 @@ VEMFRandomPos = {
     _fin
 };
 
+// Finds a Random Town on the Map
+VEMFFindTown = {
+	private ["_cntr","_townArr","_sRandomTown","_townPos","_townName","_ret"];
+	
+	// Map Incorrect Center (but center-ish)
+	_cntr = getArray(configFile >> "CfgWorlds" >> worldName >> "centerPosition");
+
+	// Get a list of towns
+	// Shouldn't cause lag because of the infrequency it runs (Needs Testing)
+	_townArr = nearestLocations [_cntr, ["NameVillage","NameCity","NameCityCapital"], 30000];
+	
+	// Pick a random town
+	_townArr = _townArr call BIS_fnc_arrayShuffle;
+	_sRandomTown = _townArr call BIS_fnc_selectRandom;
+	
+	// Return Name and POS
+	_townPos = [((getposATL _sRandomTown) select 0), ((getposATL _sRandomTown) select 1), 0];
+	_townName = (text _sRandomTown);
+
+	_ret = [_townName, _townPos];
+	_ret
+};
+
+// Finds House Positions for Units
+VEMFHousePositions = {
+	private ["_pos","_cnt","_houseArr","_fin","_loop","_bNum","_tmpArr","_bPos"];
+	
+	// CenterPOS and House Count
+	_pos = _this select 0;
+	_cnt = _this select 1;
+	
+	// Get Nearby Houses in Array
+	_houseArr = nearestObjects [_pos, ["house"], 150];
+	
+	{
+		if (str _houseArr == "[0,0,0]") then {
+			// Not a Valid House
+			_houseArr = _houseArr - [_x];
+		};
+	} forEach _houseArr;
+	
+	// Randomize Valid Houses
+	_houseArr = _houseArr call BIS_fnc_arrayShuffle;
+	
+	// Only return the amount of houses we wanted
+	_houseArr resize _cnt;
+	
+	_fin = [];
+	
+	{
+		// Keep locations separated by house for unit groups
+		_loop = true;
+		_bNum = 0;
+		_tmpArr = [];
+		while {_loop} do {
+			_bPos = _x buildingPos _bNum;
+			if (str _bPos == "[0,0,0]") then {
+				// All Positions Found
+				_loop = false;
+			} else {
+				_tmpArr = _tmpArr + _bPos;
+				_bNum = _bNum + 1;
+			};
+		};
+		
+		_fin = _fin + [_tmpArr];
+	} forEach _houseArr;
+	
+	// Returns in the following format
+	// Nested Array = [[HousePos1,Pos2,Pos3],[Pos1,Pos2],[Pos1,Pos2]];
+	_fin
+};
+
+// Temporary Vehicle Setup
+// Assume to NOT Work at This Time
+// Server "May" Have an AutoSave Loop
 VEMFSetupVic = {
-	private ["_object","_ranFuel"];
+	private ["_vehicle","_vClass","_ranFuel","_config","_textureSelectionIndex","_selections","_colors","_textures","_color","_count"];
 	_vehicle = _this select 0;
 	_vClass = (typeOf _vehicle);
 	
-	// Wait till we have a valid object
 	waitUntil {(!isNull _vehicle)};
 	
 	// Set Vehicle Token
+	// Will Delete if Not Set
 	_vehicle call EPOCH_server_setVToken;
 	
 	// Add to A3 Cleanup
@@ -164,9 +224,9 @@ VEMFSetupVic = {
 	clearItemCargoGlobal _vehicle;
 	
 	// Set the Vehicle Lock Time (0 Seconds)
-	// Vehicle Will spawn Unlocked
+	// Vehicle Will Spawn Unlocked
 	_vehicle lock true;
-	_vehicle setVariable["LOCK_OWNER", "-1"];
+	_vehicle setVariable["LOCK_OWNER", 0];
 	_vehicle setVariable["LOCKED_TILL", serverTime];
 	
 	// Pick a Random Color if Available
@@ -190,7 +250,7 @@ VEMFSetupVic = {
 			_vehicle setObjectTextureGlobal [_x,(_textures select _color)];
 		} forEach _selections;
 		
-		_vehicle setVariable["VEHICLE_TEXTURE", _color];
+		_vehicle setVariable ["VEHICLE_TEXTURE", _color];
 	};
 	
 	// Set Vehicle Init
@@ -203,17 +263,65 @@ VEMFSetupVic = {
 	_vehicle setVelocity [0,0,1];
 	_vehicle setDir (round(random 360));
 	
-	//If saving vehicles to the database is disabled, lets warn players it will disappear
-	if (!(DZMSSaveVehicles)) then {
-		_object addEventHandler ["GetIn",{
-			_nil = [nil,(_this select 2),"loc",rTITLETEXT,"Warning: This vehicle will disappear on server restart!","PLAIN DOWN",5] call RE;
+	// If the Vehicle is Temporary, Warn Players
+	if (!(VEMFSaveVehicles)) then {
+		_vehicle addEventHandler ["GetIn",{
+			_nil = ["Warning: Vehicle Will Disappear on Restart!","systemChat",(_this select 2),false,true] call BIS_fnc_MP;
 		}];
 	};
 
 	true
 };
 
-
+// Alerts Players With a Random Radio Type
+VEMFBroadcast = {
+	private ["_msg","_eRads","_rad","_sent"];
+	_msg = _this select 0;
+	_eRads = ["0","1","2","3","4","5","6","7","8","9"];
+	_eRads = _eRads call BIS_fnc_arrayShuffle;
+	
+	if (typeName _msg != "STRING") then {
+		_msg = str(_msg);
+	};
+	
+	// Pick a Radio to Broadcast On
+	_rad = _eRads call BIS_fnc_selectRandom;
+	_rad = "EpochRadio" + _rad;
+	
+	// Broadcast to Each Player
+	_sent = false;
+	_allUnits = allUnits;
+	
+	// Remove Non-Players
+	{ if (!isPlayer _x) then {_allUnits = _allUnits - (_x);}; } forEach _allUnits;
+	
+	// Broadcast on Every Radio Randomly Until Someone Hears Us
+	{
+		_n = 0;
+		while {true} do {
+			_unit = (_allUnits select _n);
+		
+			if (isPlayer _unit) then {
+				if (_rad in (assignedItems _unit)) then {
+					[(_msg),"systemChat",(_x),false,true] call BIS_fnc_MP;
+					_sent = true;
+				};
+			};
+			
+			if ((count _allUnits) == _n) exitWith {
+				// Through AllUnits
+			};
+		};
+		
+		if (_sent == true) exitWith {
+			// We Broadcast to a Radio with Someone on it
+		};
+	} forEach _eRads;
+	
+	// Return if Message was Received by Someone
+	// If FALSE, Nobody has a Radio Equipped
+	_sent
+};
 
 
 
