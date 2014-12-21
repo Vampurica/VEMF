@@ -13,7 +13,7 @@
 	// Some Error Checks
 	if (isNil "VEMFWatchAI") then { VEMFWatchAI = []; };
 	if (isNil "_grps") then { _grps = []; };
-	if (isNul "_cache") then { _cache = []; };
+	if (isNil "_cache") then { _cache = []; };
 	
 	// Check for New Units to Watch
 	if (count VEMFWatchAI > 0) then {

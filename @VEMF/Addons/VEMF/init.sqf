@@ -34,9 +34,9 @@ diag_log text format ["[VEMF]: isServer:%1 / isDedicated:%2 / isMultiplayer:%3",
 // Let's set some relations up
 diag_log text format ["[VEMF]: Setting VEMF Relations to make AI Hostile."];
 
-createCenter INDEPENDENT;
-CIVILIAN setFriend [INDEPENDENT,0];
-INDEPENDENT setFriend [CIVILIAN,0];
+createCenter RESISTANCE;
+CIVILIAN setFriend [RESISTANCE,0];
+RESISTANCE setFriend [CIVILIAN,0];
 
 diag_log text format ["[VEMF]: Looking for the Config. Ignore the associated File Not Found error."];
 
@@ -67,3 +67,6 @@ diag_log text format["[VEMF]: Server is Running Map: %1", (toLower format ["%1",
 
 // Lets load our functions
 call compile preprocessFileLineNumbers "\VEMF\Scripts\VFunctions.sqf";
+
+// Launch Watchdog
+[] ExecVM "\VEMF\Scripts\VAIWatchdog.sqf";
