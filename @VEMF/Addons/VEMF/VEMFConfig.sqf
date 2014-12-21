@@ -7,10 +7,12 @@
 	VEMF: https://github.com/SMVampire/VEMF
 */
 
-/////////////////////////////////////////////////////////////////////////////////
-// What is the minimum time a player must wait before they get another mission?
-// They cannot get a mission assignment earlier than this. Default 10mins.
-VEMFMinTime = 600;
+///////////////////////////////////////////////////////////////////
+// VEMF Debug Settings:
+// Creates a lot of RPT Entries, turn off after debugging
+VEMFDebugLocs = false;
+VEMFDebugAI = false;
+VEMFDebugFunc = false;
 
 ///////////////////////////////////////////////////////////////////
 // Blacklist Zone Array -- missions will not spawn in these areas
@@ -20,5 +22,5 @@ VEMFBlacklistZones = [
 	[[0,0,0],50]
 ];
 
-=============================================
+/* ======== Do Not Modify Below ======== */
 VEMFVersion = "1.0 DEV";
