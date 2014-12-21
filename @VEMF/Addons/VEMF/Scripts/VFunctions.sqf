@@ -5,7 +5,7 @@
 
 diag_log text "[VEMF]: Loading ExecVM Functions.";
 
-// Nothing Yet
+VEMFSpawnAI = "\VEMF\Scripts\VSpawnAI.sqf";
 
 diag_log text "[VEMF]: Loading Compiled Functions.";
 
@@ -108,7 +108,7 @@ VEMFRandomPos = {
 			};
         } forEach VEMFBlacklistZones;
 		
-		_plyrNear = {isPlayer _x} count (_testPos nearEntities[["Epoch_Male_F", "Epoch_Female_F"], 500]) > 0;
+		_plyrNear = {isPlayer _x} count (_testPos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 500]) > 0;
 		
 		// Let's Compare all our Requirements
 		if ((_posX != _hardX) AND (_posY != _hardY) AND _noWater AND _okDis AND !_isBlack AND !_plyrNear) then {
@@ -117,7 +117,7 @@ VEMFRandomPos = {
 		
 		//diag_log text format ["[VEMF]: MISSDEBUG: Pos:[%1,%2] / noWater?:%3 / okDistance?:%4 / isBlackListed:%5 / isPlayerNear:%6", _posX, _posY, _noWater, _okDis, _isBlack, _plyrNear];
         
-		sleep 2;
+		uiSleep 2;
 	};
 	
 	_fin = [(_testPos select 0), (_testPos select 1), 0];
@@ -226,7 +226,7 @@ VEMFSetupVic = {
 	// Set the Vehicle Lock Time (0 Seconds)
 	// Vehicle Will Spawn Unlocked
 	_vehicle lock true;
-	_vehicle setVariable["LOCK_OWNER", 0];
+	_vehicle setVariable["LOCK_OWNER", "-1"];
 	_vehicle setVariable["LOCKED_TILL", serverTime];
 	
 	// Pick a Random Color if Available
@@ -323,23 +323,5 @@ VEMFBroadcast = {
 	_sent
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* ================================= End Of Functions ================================= */
+diag_log text "[VEMF]: Loading: All Functions Loaded.";
