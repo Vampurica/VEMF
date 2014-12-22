@@ -3,11 +3,24 @@
 [Added] Initial Code
 [Added] Dynamic Town Invasion
 [Added] VEMF Addon Support (Needs Refined)
+[Added] Caching Watchdog (To Cache and Respawn Units)
 
 [Working On] Temporary Vehicles (Non-Hived)
 [Working On] Permanent Vehicles (Hived)
+[Working On] Unit Spawning
+[Working On] Dynamic Town Invasion Mission
 
 Thanks to:
 Richie (UKGZ) - Development Server Provider
+Epoch Mod Team for Arma 3: Epoch Development
+
+Patreon Supporters:
+	Thanks for the "Amazing" support! It really
+motivates me to keep up the work!
+
+Patrons (In No Particular Order):
+ - Vendaar
+ - Psych3UK
+ - GaspArt
 
 // ===================================================== //
