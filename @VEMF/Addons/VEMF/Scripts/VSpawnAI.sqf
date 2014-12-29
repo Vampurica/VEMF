@@ -18,20 +18,24 @@
 			Rough will spawn a unit at each position and group them more passively.
 			- Use Strict For Spawning En-Mass, and Rough for Fine Positioning
 		2: Skill Level Max (1-4)
-		3: Group Count (Optional) required if 1 is True.
+		3: Group Name
+		4: Group Count (Optional) required if 1 is True.
 			The amount of groups you want.
 			If you supply a group count, and 1 is True, you will get one group spawned at each position.
 */
-private ["_posArr","_SorR","_skill","_grpCount","_sldrClass","_unitsPerGrp","_owner","_grp","_newPos","_grpArr","_unit","_pos"];
+private ["_posArr","_SorR","_skill","_arrName","_grpCount","_sldrClass","_unitsPerGrp","_owner","_grp","_newPos","_grpArr","_unit","_pos"];
 
 _posArr   = _this select 0;
 _SorR     = _this select 1;
 _skill    = _this select 2;
-_grpCount = _this select 3;
+_arrName  = _this select 3;
+_grpCount = _this select 4;
 
 if ((typeName _posArr) != "ARRAY") exitWith { /* Not an Array */ };
 if ((typeName _SorR) != "BOOLEAN") exitWith { /* Not True/False */ };
-//if ((typeName _skill) != "SCALAR") exitWith { /* Not a Number */ };
+// Skills are Hardcoded ATM
+// if ((typeName _skill) != "SCALAR") exitWith { /* Not a Number */ };
+if ((typeName _arrName) != "STRING") exitWith { /* Not a String */ };
 if ((_SorR == true) && ((isNil "_grpCount") || (_grpCount < 1))) exitWith {
 	diag_log text format ["[VEMF]: Warning: AI Spawn: Strict Distribution Called Without Group Count!"];
 };
@@ -237,3 +241,11 @@ if (_SorR == true) then
 
 // Add Units to Cache Watchdog
 VEMFWatchAI = VEMFWatchAI + _grpArr;
+
+// Add the Units to a Mission Var to track completion.
+call compile format["
+	if (isNil '%1') then {%1 = [];};
+	{
+		%1 = %1 + (units (_grpArr select _forEachIndex));
+	} forEach _grpArr;
+", _arrName];
