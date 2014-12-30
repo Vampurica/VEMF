@@ -95,7 +95,9 @@ if (_SorR == true) then
 				_unit enableAI "FSM";
 				
 				// Prepare for Cleanup or Caching
+				_unit addEventHandler ["Local",{ [(_this select 0), (_this select 1)] ExecVM VEMFLocalHandler; }];
 				_unit addEventHandler ["Killed",{ [(_this select 0), (_this select 1)] ExecVM VEMFAIKilled; }];
+				_unit setVariable ["VEMFUArray", _arrName];
 				_unit setVariable ["VEMFAI", true];
 				
 				// Leader Assignment
@@ -160,7 +162,9 @@ if (_SorR == true) then
 			_unit enableAI "FSM";
 			
 			// Prepare for Cleanup or Caching
+			_unit addEventHandler ["Local",{ [(_this select 0), (_this select 1)] ExecVM VEMFLocalHandler; }];
 			_unit addEventHandler ["Killed",{ [(_this select 0), (_this select 1)] ExecVM VEMFAIKilled; }];
+			_unit setVariable ["VEMFUArray", _arrName];
 			_unit setVariable ["VEMFAI", true];
 			
 			// Leader Assignment
@@ -211,7 +215,9 @@ if (_SorR == true) then
 		_unit enableAI "FSM";
 		
 		// Prepare for Cleanup or Caching
+		_unit addEventHandler ["Local",{ [(_this select 0), (_this select 1)] ExecVM VEMFLocalHandler; }];
 		_unit addEventHandler ["Killed",{ [(_this select 0), (_this select 1)] ExecVM VEMFAIKilled; }];
+		_unit setVariable ["VEMFUArray", _arrName];
 		_unit setVariable ["VEMFAI", true];
 		
 		// Separate Groups via Location Distance
@@ -238,9 +244,6 @@ if (_SorR == true) then
 	
 	//diag_log text format ["[VEMF]: AI Debug: Spawned %1 Units near Grid %2", (count _posArr), (mapGridPosition _pos)];
 };
-
-// Add Units to Cache Watchdog
-VEMFWatchAI = VEMFWatchAI + _grpArr;
 
 // Add the Units to a Mission Var to track completion.
 call compile format["
