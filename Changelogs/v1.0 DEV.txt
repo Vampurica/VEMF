@@ -4,11 +4,10 @@
 [Added] Dynamic Town Invasion
 [Added] VEMF Addon Support (Needs Refined)
 [Added] Caching Watchdog (To Cache and Respawn Units)
+[Added] Unit Spawning
 
-[Working On] Temporary Vehicles (Non-Hived)
-[Working On] Permanent Vehicles (Hived)
-[Working On] Unit Spawning
 [Working On] Dynamic Town Invasion Mission
+[Working On] Unit Loadout
 
 Thanks to:
 Richie (UKGZ) - Development Server Provider
