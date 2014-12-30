@@ -68,5 +68,8 @@ diag_log text format["[VEMF]: Server is Running Map: %1", (toLower format ["%1",
 // Lets load our functions
 call compile preprocessFileLineNumbers "\VEMF\Scripts\VFunctions.sqf";
 
+// Unit Array Array
+VEMFUArray = [];
+
 // Launch Watchdog
 [] ExecVM "\VEMF\Scripts\VAIWatchdog.sqf";

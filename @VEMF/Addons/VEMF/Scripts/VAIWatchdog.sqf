@@ -2,53 +2,60 @@
 	VEMF Caching Watchdog by Vampire
 	
 	Description:
-		Epoch cleans up units that are local to the server.
-		What this means is we need to make sure the units never become local to the server.
-		This watches the AI and transfers ownership if needed, or Caches them if no one is near.
+		This script checks VEMFAI to see if they need cached or unCached.
 */
 
 [] spawn {
-	private ["_grps","_cache","_nearP"];
+	private ["_cache","_cGrp","_pos"];
 	
-	// Some Error Checks
-	if (isNil "VEMFWatchAI") then { VEMFWatchAI = []; };
-	if (isNil "_grps") then { _grps = []; };
 	if (isNil "_cache") then { _cache = []; };
+	if (isNil "VEMFForceCache") then { VEMFForceCache = []; };
 	
-	// Check for New Units to Watch
-	if (count VEMFWatchAI > 0) then {
-		_grps = _grps + VEMFWatchAI;
-		VEMFWatchAI = [];
+	// Force Caching Chunk
+	if (count VEMFForceCache > 0) then {
+		while {count VEMFForceCache > 0} do {
+			_cGrp = VEMFForceCache select 0;
+			
+			// We have Units to Force Cache
+			_cache = _cache + [(getPos leader _cGrp),(count units _cGrp),((leader _cGrp) getVariable ["VEMFUArray", "VEMFNoUArr"])];
+			{
+				deleteVehicle _x;
+			} forEach (units _cGrp);
+			
+			VEMFForceCache = VEMFForceCache - [_cGrp];
+			deleteGroup _cGrp;
+			_cGrp = grpNull;
+		};
 	};
 	
-	// Check for Group Locality Change
+	// No Nearby Players Caching Chunk
 	{
-		if (local ((units group _x) select 0)) then {
-			// Need to Cache Group or SetOwner
-			_nearP = ((getPosATL _x) nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 500]) select 0;
+		if (_x getVariable ["VEMFAI", false]) then {
+			if !(count ((getposATL leader group _x) nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 1000]) > 0) then {
+				// We need to Cache the Group
+				_cGrp = (group _x);
 			
-			if (isNil "_nearP") then {
-				// Cache Group
-				_cache = _cache + [(getPos leader group _x),(count units group _x)];
-				for "_i" from 1 to (count units group _x) do {
-					deleteVehicle ((units group _x) select 0);
-				};
-				deleteGroup _x;
-			} else {
-				// Set New Owner
-				for "_i" from 1 to (count units group _x) do {
-					((units group _x) select (_i-1)) setOwner (owner _nearP);
-				};
+				_cache = _cache + [(getPos leader _cGrp),(count units _cGrp),((leader _cGrp) getVariable ["VEMFUArray", "VEMFNoUArr"])];
+				{
+					deleteVehicle _x;
+				} forEach (units _cGrp);
+				
+				deleteGroup _cGrp;
+				_cGrp = grpNull;
 			};
 		};
-	} forEach _grps;
-
-	// Check if Units need Un-Cached
+	} forEach allUnits;
+	
+	// UnCaching Chunk
 	{
-		if (((_x select 0) nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) > 0) then {
-			[(_x select 0),true,1,(_x select 1)] ExecVM VEMFSpawnAI;
+		_pos = (_x select 0);
+		if (count(_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 600]) > 0) then {
+			// UnCache Group
+			[_pos,true,1,(_x select 2),(_x select 1)] ExecVM VEMFSpawnAI;
+			_cache = _cache - [_x];
 		};
 	} forEach _cache;
 	
-	uiSleep 10;
+	// Sleep 10 Minutes
+	uiSleep 600;
 };
