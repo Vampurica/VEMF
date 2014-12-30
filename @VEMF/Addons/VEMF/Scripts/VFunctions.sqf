@@ -6,6 +6,8 @@
 diag_log text "[VEMF]: Loading ExecVM Functions.";
 
 VEMFSpawnAI = "\VEMF\Scripts\VSpawnAI.sqf";
+VEMFAIKilled = "\VEMF\Scripts\VAIKilled.sqf";
+VEMFLocalHandler = "\VEMF\Scripts\VLocalEventhandler.sqf";
 
 diag_log text "[VEMF]: Loading Compiled Functions.";
 
@@ -321,6 +323,37 @@ VEMFBroadcast = {
 	// Return if Message was Received by Someone
 	// If FALSE, Nobody has a Radio Equipped
 	_sent
+};
+
+// Waits for players to be within the radius of the position
+// Will loop indefinitely until true
+VEMFNearWait = {
+	private ["_pos","_rad"];
+	
+	_pos = _this select 0;
+	_rad = _this select 1;
+	
+	while {true} do {
+		if ((_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], _rad]) > 0) exitWith {};
+		uiSleep 5;
+	};
+	
+	true
+};
+
+// Waits for the Mission to be Completed
+VEMFWaitMissComp = {
+    private["_objective","_unitArrayName","_numSpawned","_numKillReq"];
+	
+    _objective = _this select 0;
+    _unitArrayName = _this select 1;
+	
+    call compile format["_numSpawned = count %1;",_unitArrayName];
+    _numKillReq = ceil(VEMFRequiredKillPercent * _numSpawned);
+	
+    //diag_log text format["[VEMF]: (%3) Waiting for %1/%2 Units or Less to be Alive and a Player to be Near the Objective.",(_numSpawned - _numKillReq),_numSpawned,_unitArrayName];
+	
+    call compile format["waitUntil{ uiSleep 1; ({isPlayer _x && _x distance _objective <= 30} count playableUnits > 0) && ({alive _x} count %1 <= (_numSpawned - _numKillReq));};",_unitArrayName];
 };
 
 /* ================================= End Of Functions ================================= */
