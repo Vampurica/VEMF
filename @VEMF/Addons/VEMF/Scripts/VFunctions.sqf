@@ -202,6 +202,7 @@ VEMFHousePositions = {
 // Temporary Vehicle Setup
 // Assume to NOT Work at This Time
 // Server "May" Have an AutoSave Loop
+/* Disabled Until Later Version
 VEMFSetupVic = {
 	private ["_vehicle","_vClass","_ranFuel","_config","_textureSelectionIndex","_selections","_colors","_textures","_color","_count"];
 	_vehicle = _this select 0;
@@ -273,7 +274,7 @@ VEMFSetupVic = {
 	};
 
 	true
-};
+}; */
 
 // Alerts Players With a Random Radio Type
 VEMFBroadcast = {
