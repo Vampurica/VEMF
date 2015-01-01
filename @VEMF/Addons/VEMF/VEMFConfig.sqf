@@ -22,5 +22,12 @@ VEMFBlacklistZones = [
 	[[0,0,0],50]
 ];
 
+// Blacklisted Weapons
+VEMFWepBlack = [
+	"ChainSaw",
+	"Hatchet",
+	"speargun_epoch"
+];
+
 /* ======== Do Not Modify Below ======== */
 VEMFVersion = "1.0 DEV";
