@@ -83,6 +83,9 @@ if (_SorR == true) then
 				// Create Unit There
 				_unit = _grp createUnit [_sldrClass, _newPos, [], 0, "FORM"];
 				
+				// Load the AI
+				[_unit] call VEMFLoadAIGear;
+				
 				// Enable its AI
 				_unit setSkill 0.6;
 				_unit setRank "Private";
@@ -150,6 +153,9 @@ if (_SorR == true) then
 			// Create Unit There
 			_unit = _grp createUnit [_sldrClass, _newPos, [], 0, "FORM"];
 			
+			// Load the AI
+			[_unit] call VEMFLoadAIGear;
+			
 			// Enable its AI
 			_unit setSkill 0.6;
 			_unit setRank "Private";
@@ -202,6 +208,9 @@ if (_SorR == true) then
 	{
 		// Create Unit
 		_unit = _grp createUnit [_sldrClass, _x, [], 0, "FORM"];
+		
+		// Load the AI
+		[_unit] call VEMFLoadAIGear;
 	
 		// Enable its AI
 		_unit setSkill 0.6;

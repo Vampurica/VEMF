@@ -276,6 +276,73 @@ VEMFSetupVic = {
 	true
 }; */
 
+// Loads a New AI Full of Gear
+VEMFLoadAIGear = {
+	private ["_unit","_fin","_prim","_seco","_pAmmo","_hAmmo"];
+	
+	_unit = _this select 0;
+	_fin = false;
+	
+	if (!isNull _unit) then {
+		// Strip Unit
+		removeAllWeapons _unit;
+		{_unit removeMagazine _x;} foreach (magazines _unit);
+		removeAllItems _unit;
+		//removeUniform _unit;
+		removeVest _unit;
+		removeBackpack _unit;
+		removeGoggles _unit;
+		removeHeadGear _unit;
+		
+		// Add Uniform
+		// _unit forceAddUniform "U_I_CombatUniform_shortsleeve";
+		// Blackout For Now
+		_unit setObjectTexture [0, "#(rgb,1,1,1)color(0.01,0.01,0.01,1)"];
+		
+		// Add Headgear
+		_unit addHeadGear (VEMFHeadgearList call BIS_fnc_selectRandom);
+		
+		// Add Vest (Random 40 Vests)
+		_unit addVest ("V_" + str(floor(random 41)) + "_EPOCH");
+		
+		// Add Backpack (Future?)
+		
+		// Add Weapons & Ammo
+		_prim = VEMFRiflesList call BIS_fnc_selectRandom;
+		_seco = VEMFPistolsList call BIS_fnc_selectRandom;
+		
+		_pAmmo = [] + getArray (configFile >> "cfgWeapons" >> _prim >> "magazines");
+		{
+			if (isClass(configFile >> "CfgPricing" >> _x)) exitWith {
+				_unit addMagazine _x;
+				_unit addMagazine _x;
+				for "_i" from 0 to (floor(random 3)) do {
+					_unit addMagazine _x;
+				};
+			};
+		} forEach _pAmmo;
+		
+		_hAmmo = [] + getArray (configFile >> "cfgWeapons" >> _seco >> "magazines");
+		{
+			if (isClass(configFile >> "CfgPricing" >> _x)) exitWith {
+				_unit addMagazine _x;
+				_unit addMagazine _x;
+				for "_i" from 0 to (floor(random 4)) do {
+					_unit addMagazine _x;
+				};
+			};
+		} forEach _hAmmo;
+		
+		_unit addWeapon _prim;
+		_unit selectWeapon _prim;
+		_unit addWeapon _seco;
+		
+		_fin = true;
+	};
+	
+	_fin
+};
+
 // Alerts Players With a Random Radio Type
 VEMFBroadcast = {
 	private ["_msg","_eRads","_rad","_sent"];
