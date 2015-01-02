@@ -5,9 +5,11 @@
 [Added] VEMF Addon Support (Needs Refined)
 [Added] Caching Watchdog (To Cache and Respawn Units)
 [Added] Unit Spawning
+[Added] Dynamic Unit Loadout
 
 [Working On] Dynamic Town Invasion Mission
-[Working On] Unit Loadout
+[Working On] Caching / Owner Logic
+[Working On] Code Layout / Debug Options
 
 Thanks to:
 Richie (UKGZ) - Development Server Provider
@@ -23,5 +25,6 @@ Patrons (In No Particular Order):
  - GaspArt
  - Sascha Lindner
  - Yip
+ - theirongiant
 
 // ===================================================== //
