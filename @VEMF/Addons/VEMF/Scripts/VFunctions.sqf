@@ -288,22 +288,22 @@ VEMFLoadAIGear = {
 		removeAllWeapons _unit;
 		{_unit removeMagazine _x;} foreach (magazines _unit);
 		removeAllItems _unit;
-		//removeUniform _unit;
+		removeUniform _unit;
 		removeVest _unit;
 		removeBackpack _unit;
 		removeGoggles _unit;
 		removeHeadGear _unit;
 		
 		// Add Uniform
-		// _unit forceAddUniform "U_I_CombatUniform_shortsleeve";
-		// Blackout For Now
-		_unit setObjectTexture [0, "#(rgb,1,1,1)color(0.01,0.01,0.01,1)"];
+		_unit forceAddUniform (VEMFUniformList call BIS_fnc_selectRandom);
 		
 		// Add Headgear
 		_unit addHeadGear (VEMFHeadgearList call BIS_fnc_selectRandom);
 		
 		// Add Vest (Random 40 Vests)
-		_unit addVest ("V_" + str(floor(random 41)) + "_EPOCH");
+		_vVar = (floor(random 41));
+		if (_vVar == 0) then { _vVar = 1; };
+		_unit addVest ("V_" + str(_vVar) + "_EPOCH");
 		
 		// Add Backpack (Future?)
 		
@@ -421,7 +421,7 @@ VEMFWaitMissComp = {
 	
     //diag_log text format["[VEMF]: (%3) Waiting for %1/%2 Units or Less to be Alive and a Player to be Near the Objective.",(_numSpawned - _numKillReq),_numSpawned,_unitArrayName];
 	
-    call compile format["waitUntil{ uiSleep 1; ({isPlayer _x && _x distance _objective <= 30} count playableUnits > 0) && ({alive _x} count %1 <= (_numSpawned - _numKillReq));};",_unitArrayName];
+    call compile format["waitUntil{ uiSleep 1; ({isPlayer _x && _x distance _objective <= 30} count playableUnits > 0) && (count %1 <= (_numSpawned - _numKillReq));};",_unitArrayName];
 };
 
 /* ================================= End Of Functions ================================= */

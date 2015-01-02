@@ -53,6 +53,16 @@ if (_mConfig != '') then {
 	_mConfig = nil; // Kill Var
 	call compile preprocessFileLineNumbers "\VEMF\VEMFConfig.sqf";
 };
+_aiConfig = preprocessFileLineNumbers "VEMFAIConfig.sqf";
+if (_aiConfig != '') then {
+	// Config is in the Mission
+	_aiConfig = nil; // Kill Var
+	call compile preprocessFileLineNumbers "VEMFAIConfig.sqf";
+} else {
+	// Use the Config in the Addon
+	_aiConfig = nil; // Kill Var
+	call compile preprocessFileLineNumbers "\VEMF\VEMFAIConfig.sqf";
+};
 
 // Report the version
 diag_log text format ["[VEMF]: Currently Running Version: %1", VEMFVersion];
