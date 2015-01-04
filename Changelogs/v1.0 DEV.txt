@@ -1,6 +1,6 @@
 // ===================================================== //
 
-[Added] Initial Code
+[Added] Initial Code (v1.0.0-alpha)
 [Added] Dynamic Town Invasion
 [Added] VEMF Addon Support (Needs Refined)
 [Added] Caching Watchdog (To Cache and Respawn Units)
@@ -23,6 +23,7 @@ Patrons (In No Particular Order):
  - Vendaar
  - Psych3UK
  - GaspArt
+ - dennis_stk
  - Sascha Lindner
  - Yip
  - theirongiant
