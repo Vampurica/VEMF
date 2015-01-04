@@ -6,6 +6,8 @@
 */
 
 // Only Runs if Dynamic Weapons = true
+if (!(VEMFDynWeapons)) exitWith {};
+
 VEMFRiflesList = [];
 VEMFPistolsList = [];
 
@@ -16,7 +18,7 @@ VEMFPistolsList = [];
 			VEMFRiflesList pushBack (configName _x);
 		};
 	};
-} forEach ("getNumber(_x >> 'price') != -1" configClasses (configFile >> "CfgPricing"));
+} forEach ("getNumber(_x >> 'price') > 0" configClasses (configFile >> "CfgPricing"));
 
 // Get All Pistols for Sale
 {
@@ -25,4 +27,4 @@ VEMFPistolsList = [];
 			VEMFPistolsList pushBack (configName _x);
 		};
 	};
-} forEach ("getNumber(_x >> 'price') != -1" configClasses (configFile >> "CfgPricing"));
+} forEach ("getNumber(_x >> 'price') > 0" configClasses (configFile >> "CfgPricing"));
