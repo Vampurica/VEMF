@@ -14,6 +14,11 @@ VEMFDebugLocs = false;
 VEMFDebugAI = false;
 VEMFDebugFunc = false;
 
+// Custom Addon Array (Don't Touch Unless You're Positive)
+// What is your addon script name?
+// Example: Caves.sqf
+VEMFAddon = [""];
+
 ///////////////////////////////////////////////////////////////////
 // Blacklist Zone Array -- missions will not spawn in these areas
 // format: [[x,y,z],radius]
@@ -23,4 +28,4 @@ VEMFBlacklistZones = [
 ];
 
 /* ======== Do Not Modify Below ======== */
-VEMFVersion = "1.0 DEV";
+VEMFVersion = "1.0.0-dev";

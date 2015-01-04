@@ -68,7 +68,7 @@ if (_aiConfig != '') then {
 diag_log text format ["[VEMF]: Currently Running Version: %1", VEMFVersion];
 
 // Version Check
-if (VEMFVersion != "1.0 DEV") then {
+if (VEMFVersion != "1.0.0-dev") then {
 	diag_log text format ["[VEMF]: Outdated Configuration Detected! Please Update."];
 };
 
@@ -78,8 +78,9 @@ diag_log text format["[VEMF]: Server is Running Map: %1", (toLower format ["%1",
 // Lets load our functions
 call compile preprocessFileLineNumbers "\VEMF\Scripts\VFunctions.sqf";
 
-// Unit Array Array
-VEMFUArray = [];
+// Let's Load any Addons
+VEMFLock = false;
+[] ExecVM VEMFLoadAddons;
 
 // Launch Watchdog
 [] ExecVM "\VEMF\Scripts\VAIWatchdog.sqf";
