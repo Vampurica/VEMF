@@ -8,6 +8,8 @@ diag_log text "[VEMF]: Loading ExecVM Functions.";
 VEMFSpawnAI = "\VEMF\Scripts\VSpawnAI.sqf";
 VEMFAIKilled = "\VEMF\Scripts\VAIKilled.sqf";
 VEMFLocalHandler = "\VEMF\Scripts\VLocalEventhandler.sqf";
+VEMFGenRanWeps = "\VEMF\Scripts\VGenWeapons.sqf";
+VEMFLoadAddons = "\VEMF\Scripts\VAddonLoader.sqf";
 
 diag_log text "[VEMF]: Loading Compiled Functions.";
 
@@ -48,7 +50,11 @@ VEMFMapCenter = {
 		case "smd_sahrani_a2":{_centerPos = [13200, 8850, 0]};
 		case "sauerland":{_centerPos = [12800, 12800, 0];_mapRadii = 12800;};
 		case "trinity":{_centerPos = [6400, 6400, 0];_mapRadii = 6400;};
-		default {_centerPos = [0,0,0];_mapRadii = 5500;};
+		default {_centerPos = (getMarkerPos "center");_mapRadii = 5500;};
+	};
+	
+	if (VEMFDebugLocs) then {
+		diag_log text format ["[VEMF]: MISSDEBUG: Map:%1 / CenterPos:%2 / Radius:%3", _mapName, str(_centerPos), _mapRadii];
 	};
 	
 	if ((_centerPos select 0) == 0) then {
@@ -117,7 +123,9 @@ VEMFRandomPos = {
 			_findRun = false;
         };
 		
-		//diag_log text format ["[VEMF]: MISSDEBUG: Pos:[%1,%2] / noWater?:%3 / okDistance?:%4 / isBlackListed:%5 / isPlayerNear:%6", _posX, _posY, _noWater, _okDis, _isBlack, _plyrNear];
+		if (VEMFDebugLocs) then {
+			diag_log text format ["[VEMF]: MISSDEBUG: Pos:[%1,%2] / noWater?:%3 / okDistance?:%4 / isBlackListed:%5 / isPlayerNear:%6", _posX, _posY, _noWater, _okDis, _isBlack, _plyrNear];
+		};
         
 		uiSleep 2;
 	};
@@ -135,10 +143,10 @@ VEMFFindTown = {
 
 	// Get a list of towns
 	// Shouldn't cause lag because of the infrequency it runs (Needs Testing)
-	_townArr = nearestLocations [_cntr, ["NameVillage","NameCity","NameCityCapital"], 30000];
+	//_townArr = nearestLocations [_cntr, ["NameVillage","NameCity","NameCityCapital"], 30000];
+	_townArr = nearestLocations [_cntr, ["NameVillage"], 30000];
 	
 	// Pick a random town
-	_townArr = _townArr call BIS_fnc_arrayShuffle;
 	_sRandomTown = _townArr call BIS_fnc_selectRandom;
 	
 	// Return Name and POS
@@ -193,6 +201,10 @@ VEMFHousePositions = {
 		
 		_fin = _fin + [_tmpArr];
 	} forEach _houseArr;
+	
+	if (VEMFDebugFunc) then {
+		diag_log text format ["[VEMF]: HousePos: %1", str(_fin)];
+	};
 	
 	// Returns in the following format
 	// Nested Array = [[HousePos1,Pos2,Pos3],[Pos1,Pos2],[Pos1,Pos2]];
@@ -301,9 +313,10 @@ VEMFLoadAIGear = {
 		_unit addHeadGear (VEMFHeadgearList call BIS_fnc_selectRandom);
 		
 		// Add Vest (Random 40 Vests)
-		_vVar = (floor(random 41));
+		/* _vVar = (floor(random 41));
 		if (_vVar == 0) then { _vVar = 1; };
-		_unit addVest ("V_" + str(_vVar) + "_EPOCH");
+		_unit addVest ("V_" + str(_vVar) + "_EPOCH"); */
+		_unit addVest (VEMFVestList call BIS_fnc_selectRandom);
 		
 		// Add Backpack (Future?)
 		
@@ -336,6 +349,10 @@ VEMFLoadAIGear = {
 		_unit addWeapon _prim;
 		_unit selectWeapon _prim;
 		_unit addWeapon _seco;
+		
+		if (VEMFDebugFunc) then {
+			diag_log text format ["[VEMF]: LoadGear: Uniform: %1 / Vest: %2 / Hat: %3 / Weps: %4 / Mags: %5", (uniform _unit), (vest _unit), (headgear _unit), (weapons _unit), (magazines _unit)];
+		};
 		
 		_fin = true;
 	};
@@ -411,7 +428,7 @@ VEMFNearWait = {
 
 // Waits for the Mission to be Completed
 VEMFWaitMissComp = {
-    private["_objective","_unitArrayName","_numSpawned","_numKillReq"];
+    private ["_objective","_unitArrayName","_numSpawned","_numKillReq"];
 	
     _objective = _this select 0;
     _unitArrayName = _this select 1;
@@ -419,7 +436,9 @@ VEMFWaitMissComp = {
     call compile format["_numSpawned = count %1;",_unitArrayName];
     _numKillReq = ceil(VEMFRequiredKillPercent * _numSpawned);
 	
-    //diag_log text format["[VEMF]: (%3) Waiting for %1/%2 Units or Less to be Alive and a Player to be Near the Objective.",(_numSpawned - _numKillReq),_numSpawned,_unitArrayName];
+	if (VEMFDebugFunc) then {
+		diag_log text format["[VEMF]: (%3) Waiting for %1/%2 Units or Less to be Alive and a Player to be Near the Objective.", (_numSpawned - _numKillReq), _numSpawned, _unitArrayName];
+	};
 	
     call compile format["waitUntil{ uiSleep 1; ({isPlayer _x && _x distance _objective <= 30} count playableUnits > 0) && (count %1 <= (_numSpawned - _numKillReq));};",_unitArrayName];
 };
