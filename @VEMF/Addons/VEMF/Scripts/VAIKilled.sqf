@@ -27,7 +27,6 @@ if (_killer isKindOf "Man") then {
 		call compile format["
 			if (isNil '%1') then {%1 = [];};
 			if (count %1 == 1) then {
-				/* Last Unit at Mission */
 				%1Killer = _killer;
 			};
 		", _tracker];
