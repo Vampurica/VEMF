@@ -83,4 +83,7 @@ VEMFLock = false;
 [] ExecVM VEMFLoadAddons;
 
 // Launch Watchdog
-[] ExecVM "\VEMF\Scripts\VAIWatchdog.sqf";
+[] ExecVM VEMFMissWatchdog;
+
+// Launch Mission Timer
+[] ExecVM VEMFMissTimer;
