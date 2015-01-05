@@ -51,7 +51,15 @@
 		_pos = (_x select 0);
 		if (count(_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 600]) > 0) then {
 			// UnCache Group
-			[_pos,true,1,(_x select 2),(_x select 1)] ExecVM VEMFSpawnAI;
+			call compile format ["
+				if (isNil '%1') then { %1 = []; };
+				if (count %1 < 1) then {
+					[_pos,true,1,'VEMFNoUArr',(_x select 1)] ExecVM VEMFSpawnAI;
+				} else {
+					[_pos,true,1,'%1',(_x select 1)] ExecVM VEMFSpawnAI;
+				};
+			", (_x select 2)];
+			
 			_cache = _cache - [_x];
 		};
 	} forEach _cache;
