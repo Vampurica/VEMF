@@ -57,7 +57,7 @@ if (_SorR == true) then
 		};
 		
 		// Find the Owner
-		_owner = owner (((_posArr select 0) nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) select 0);
+		//_owner = owner (((_posArr select 0) nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) select 0);
 		
 		// Create the Group
 		_grp = createGroup RESISTANCE;
@@ -102,6 +102,7 @@ if (_SorR == true) then
 				_unit addEventHandler ["Killed",{ [(_this select 0), (_this select 1)] ExecVM VEMFAIKilled; }];
 				_unit setVariable ["VEMFUArray", _arrName];
 				_unit setVariable ["VEMFAI", true];
+				_unit setVariable ["LASTLOGOUT_EPOCH", (diag_tickTime + 14400)];
 				
 				// Leader Assignment
 				if (count (units _grp) == _unitsPerGrp) then {
@@ -110,7 +111,7 @@ if (_SorR == true) then
 				};
 				
 				// Set Owner to Prevent Server Local Cleanup
-				_unit setOwner _owner;
+				//_unit setOwner _owner;
 			};
 		} forEach _posArr;
 
@@ -127,7 +128,7 @@ if (_SorR == true) then
 		};
 		
 		// Find the Owner
-		_owner = owner ((_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) select 0);
+		//_owner = owner ((_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) select 0);
 	
 		// Create the Group
 		_grp = createGroup RESISTANCE;
@@ -172,6 +173,7 @@ if (_SorR == true) then
 			_unit addEventHandler ["Killed",{ [(_this select 0), (_this select 1)] ExecVM VEMFAIKilled; }];
 			_unit setVariable ["VEMFUArray", _arrName];
 			_unit setVariable ["VEMFAI", true];
+			_unit setVariable ["LASTLOGOUT_EPOCH", (diag_tickTime + 14400)];
 			
 			// Leader Assignment
 			if (count (units _grp) == _unitsPerGrp) then {
@@ -180,7 +182,7 @@ if (_SorR == true) then
 			};
 			
 			// Set Owner to Prevent Server Local Cleanup
-			_unit setOwner _owner;
+			//_unit setOwner _owner;
 		};
 		
 		//diag_log text format ["[VEMF]: AI Debug: Spawned %1 Units at Grid %2", (_grpCount*_unitsPerGrp), (mapGridPosition _pos)];
@@ -198,7 +200,7 @@ if (_SorR == true) then
 	_pos = _posArr select 0;
 	
 	// Find the Owner
-	_owner = owner ((_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) select 0);
+	//_owner = owner ((_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) select 0);
 	
 	// Create the Group
 	_grp = createGroup RESISTANCE;
@@ -228,6 +230,7 @@ if (_SorR == true) then
 		_unit addEventHandler ["Killed",{ [(_this select 0), (_this select 1)] ExecVM VEMFAIKilled; }];
 		_unit setVariable ["VEMFUArray", _arrName];
 		_unit setVariable ["VEMFAI", true];
+		_unit setVariable ["LASTLOGOUT_EPOCH", (diag_tickTime + 14400)];
 		
 		// Separate Groups via Location Distance
 		// Logic is that group positions come in via houses
@@ -247,8 +250,7 @@ if (_SorR == true) then
 		};
 		
 		// Set Owner to Prevent Server Local Cleanup
-		_owner = (_newPos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) select 0;
-		_unit setOwner (owner _owner);
+		//_unit setOwner (owner _owner);
 	} forEach _posArr;
 	
 	//diag_log text format ["[VEMF]: AI Debug: Spawned %1 Units near Grid %2", (count _posArr), (mapGridPosition _pos)];
