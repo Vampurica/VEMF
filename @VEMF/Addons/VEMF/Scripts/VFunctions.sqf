@@ -10,6 +10,8 @@ VEMFAIKilled = "\VEMF\Scripts\VAIKilled.sqf";
 VEMFLocalHandler = "\VEMF\Scripts\VLocalEventhandler.sqf";
 VEMFGenRanWeps = "\VEMF\Scripts\VGenWeapons.sqf";
 VEMFLoadAddons = "\VEMF\Scripts\VAddonLoader.sqf";
+VEMFMissWatchdog = "\VEMF\Scripts\VAIWatchdog.sqf"
+VEMFMissTimer = "\VEMF\Scripts\VMissionTimer.sqf";
 
 diag_log text "[VEMF]: Loading Compiled Functions.";
 
@@ -35,6 +37,7 @@ VEMFMapCenter = {
 
 		/* Arma 2 Maps (May Need Updating) */
 		case "chernarus":{_centerPos = [7100, 7750, 0];_mapRadii = 5500;};
+		case "chernarus_summer":{_centerPos = [7100, 7750, 0];_mapRadii = 5500;};
 		case "utes":{_centerPos = [3500, 3500, 0];_mapRadii = 3500;};
 		case "zargabad":{_centerPos = [4096, 4096, 0];_mapRadii = 4096;};
 		case "fallujah":{_centerPos = [3500, 3500, 0];_mapRadii = 3500;};
@@ -50,7 +53,7 @@ VEMFMapCenter = {
 		case "smd_sahrani_a2":{_centerPos = [13200, 8850, 0]};
 		case "sauerland":{_centerPos = [12800, 12800, 0];_mapRadii = 12800;};
 		case "trinity":{_centerPos = [6400, 6400, 0];_mapRadii = 6400;};
-		default {_centerPos = (getMarkerPos "center");_mapRadii = 5500;};
+		default {_centerPos = (epoch_centerMarkerPosition);_mapRadii = 5500;};
 	};
 	
 	if (VEMFDebugLocs) then {
@@ -138,8 +141,7 @@ VEMFRandomPos = {
 VEMFFindTown = {
 	private ["_cntr","_townArr","_sRandomTown","_townPos","_townName","_ret"];
 	
-	// Map Incorrect Center (but center-ish)
-	_cntr = getArray(configFile >> "CfgWorlds" >> worldName >> "centerPosition");
+	_cntr = (epoch_centerMarkerPosition);
 
 	// Get a list of towns
 	// Shouldn't cause lag because of the infrequency it runs (Needs Testing)
@@ -358,6 +360,38 @@ VEMFLoadAIGear = {
 	};
 	
 	_fin
+};
+
+VEMFLoadLoot = {
+	private ["_crate","_var"];
+	
+	_crate = _this select 0;
+	
+	if (isNil "VEMFLootList") then {
+		// Generate Loot
+		{
+			VEMFLootItems = VEMFLootItems + (getArray(_x >> 'items'));
+			VEMFLootList = VEMFLootList + (getArray(_x >> 'items'));
+		} forEach ("getText(_x >> 'itemType') == 'item'" configClasses (configFile >> "CfgLootTable"));
+		
+		{
+			VEMFLootMags = VEMFLootMags + (getArray(_x >> 'items'));
+			VEMFLootList = VEMFLootList + (getArray(_x >> 'items'));
+		} forEach ("getText(_x >> 'itemType') == 'magazine'" configClasses (configFile >> "CfgLootTable"));
+	};
+	
+	// Load Random Loot Amount
+	for "_i" from 1 to (floor(random 4) + 1) do {
+		_var = (VEMFLootList call BIS_fnc_selectRandom);
+		
+		switch (true) do {
+			case (_var in VEMFLootItems): { _crate addItemCargoGlobal [_var,(floor(random(3)))+1]; };
+			case (_var in VEMFLootMags): { _crate addMagazineCargoGlobal [_var,(floor(random(3)))+1]; };
+		};
+	};
+	
+	// Delay Cleanup
+	_crate setVariable["LAST_CHECK", (diag_tickTime + 600)];
 };
 
 // Alerts Players With a Random Radio Type
