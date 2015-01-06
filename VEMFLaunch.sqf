@@ -9,8 +9,6 @@ if (isServer) then {
 };
 
 "VEMFChatMsg" addPublicVariableEventHandler {
-	if (player == (_this select 0)) then {
-		systemChat (_this select 1);
-	};
+	systemChat (_this select 1);
 	VEMFChatMsg = nil;
 };

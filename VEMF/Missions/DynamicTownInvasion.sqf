@@ -69,8 +69,8 @@ if (_alert == false) exitWith {
 // Rewards
 if (!(isNil "VEMFDynInvKiller")) then {
 	_winMsg = format ["%1 has been cleared! You can find your reward at the town center.", (_canTown select 0)];
-	VEMFChatMsg = [VEMFDynInvKiller, _winMsg];
-	publicVariable "VEMFChatMsg";
+	VEMFChatMsg = [_winMsg];
+	(owner (vehicle VEMFDynInvKiller)) publicVariableClient "VEMFChatMsg";
 	VEMFDynKiller = nil;
 	
 	_crate = createVehicle ["Land_PaperBox_C_EPOCH",(_canTown select 1),[],0,"CAN_COLLIDE"];

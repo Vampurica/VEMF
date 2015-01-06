@@ -424,8 +424,8 @@ VEMFBroadcast = {
 		
 			if (isPlayer _unit) then {
 				if (_rad in (assignedItems _unit)) then {
-					VEMFChatMsg = [VEMFDynInvKiller, _msg];
-					publicVariable "VEMFChatMsg";
+					VEMFChatMsg = [_msg];
+					(owner (vehicle _unit)) publicVariableClient "VEMFChatMsg";
 					_sent = true;
 				};
 			};
