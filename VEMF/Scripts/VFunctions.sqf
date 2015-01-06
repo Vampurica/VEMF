@@ -424,7 +424,8 @@ VEMFBroadcast = {
 		
 			if (isPlayer _unit) then {
 				if (_rad in (assignedItems _unit)) then {
-					[(_msg),"systemChat",(_x),false,true] call BIS_fnc_MP;
+					VEMFChatMsg = [VEMFDynInvKiller, _msg];
+					publicVariable "VEMFChatMsg";
 					_sent = true;
 				};
 			};
