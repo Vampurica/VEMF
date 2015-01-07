@@ -51,7 +51,7 @@ while {true} do {
 _msg = format ["We have spotted hostile fireteams in %1! We'll give you some supplies if you can liberate the town.", (_canTown select 0)];
 _alert = [_msg] call VEMFBroadcast;
 
-if (_alert == false) exitWith {
+if (!_alert) exitWith {
 	// No Players have a Radio Equipped. Maybe we can try later?
 	diag_log text format ["[VEMF]: DynTownInv: Mission Ended for No Active Radios."];
 	VEMFTownInvaded = nil;

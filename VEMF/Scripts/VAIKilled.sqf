@@ -18,7 +18,7 @@ if (_killer isKindOf "Man") then {
 		// Alert Nearby AI
 		{
 			if ((_x distance _killer) <= 500) then {
-				_x reveal [_player, 4.0];
+				_x reveal [_killer, 4.0];
 			};
 		} forEach (units group _unit);
 		(group _unit) setFormDir ([(leader group _unit), _killer] call BIS_fnc_dirTo);
@@ -40,7 +40,7 @@ if (_killer isKindOf "Man") then {
 		// Alert Nearby AI
 		{
 			if ((_x distance _killer) <= 800) then {
-				_x reveal [_player, 4.0];
+				_x reveal [_killer, 4.0];
 			};
 		} forEach (units group _unit);
 		(group _unit) setFormDir ([(leader group _unit), _killer] call BIS_fnc_dirTo);

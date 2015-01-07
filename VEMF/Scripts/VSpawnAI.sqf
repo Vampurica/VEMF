@@ -36,7 +36,7 @@ if ((typeName _SorR) != "BOOLEAN") exitWith { /* Not True/False */ };
 // Skills are Hardcoded ATM
 // if ((typeName _skill) != "SCALAR") exitWith { /* Not a Number */ };
 if ((typeName _arrName) != "STRING") exitWith { /* Not a String */ };
-if ((_SorR == true) && ((isNil "_grpCount") || (_grpCount < 1))) exitWith {
+if ((_SorR) && ((isNil "_grpCount") || (_grpCount < 1))) exitWith {
 	diag_log text format ["[VEMF]: Warning: AI Spawn: Strict Distribution Called Without Group Count!"];
 };
 
@@ -44,7 +44,7 @@ _sldrClass = "I_Soldier_EPOCH";
 _unitsPerGrp = 4;
 
 // We need to do this two very different ways depending on Strict or Rough Distribution
-if (_SorR == true) then
+if (_SorR) then
 {
 	// Strict Distribution
 
