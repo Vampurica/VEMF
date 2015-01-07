@@ -10,7 +10,7 @@
 		\VEMF\Addons\Caves\init.sqf
 */
 
-if (VEMFLock == true) exitWith {};
+if (VEMFLock) exitWith {};
 
 // Time Lock
 if (round(serverTime/60) > 5) exitWith {
