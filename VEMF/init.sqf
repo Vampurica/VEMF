@@ -62,7 +62,6 @@ if (VEMFVersion != "1.0.0-dev") then {
 	diag_log text format ["[VEMF]: Outdated Configuration Detected! Please Update."];
 };
 
-diag_log text format ["[VEMF]: Configurations Loaded."];
 diag_log text format["[VEMF]: Server is Running Map: %1", (toLower format ["%1", worldName])];
 
 // Lets load our functions

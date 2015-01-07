@@ -108,4 +108,5 @@ VEMFPistolsList = [
 ];
 
 /* ======== Do Not Modify Below ======== */
+diag_log text format ["[VEMF]: Config Loaded!"];
 VEMFVersion = "1.0.0-dev";
