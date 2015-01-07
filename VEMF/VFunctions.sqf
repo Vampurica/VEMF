@@ -479,4 +479,4 @@ VEMFWaitMissComp = {
 };
 
 /* ================================= End Of Functions ================================= */
-diag_log text "[VEMF]: Loading: All Functions Loaded.";
+diag_log text "[VEMF]: All Functions Loaded.";
