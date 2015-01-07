@@ -152,7 +152,7 @@ VEMFFindTown = {
 	_sRandomTown = _townArr call BIS_fnc_selectRandom;
 	
 	// Return Name and POS
-	_townPos = [((getposATL _sRandomTown) select 0), ((getposATL _sRandomTown) select 1), 0];
+	_townPos = [((locationPosition _sRandomTown) select 0), ((locationPosition _sRandomTown) select 1), 0];
 	_townName = (text _sRandomTown);
 
 	_ret = [_townName, _townPos];
