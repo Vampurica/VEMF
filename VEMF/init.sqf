@@ -38,7 +38,7 @@ createCenter RESISTANCE;
 CIVILIAN setFriend [RESISTANCE,0];
 RESISTANCE setFriend [CIVILIAN,0];
 
-diag_log text format ["[VEMF]: Looking for the Config. Ignore the associated File Not Found error."];
+//diag_log text format ["[VEMF]: Looking for the Config. Ignore the associated File Not Found error."];
 
 // Let's Load the Mission Configuration
 // This code checks for a config file in the Mission Root before using the Addon Config
