@@ -6,10 +6,8 @@
 [Added] Caching Watchdog (To Cache and Respawn Units)
 [Added] Unit Spawning
 [Added] Dynamic Unit Loadout
-
-[Working On] Dynamic Town Invasion Mission
-[Working On] Caching / Owner Logic
-[Working On] Code Layout / Debug Options
+[Added] Dynamic Town Invasion Mission
+[Added] Debug Options
 
 Thanks to:
 Richie (UKGZ) - Development Server Provider
@@ -27,5 +25,8 @@ Patrons (In No Particular Order):
  - Sascha Lindner
  - Yip
  - theirongiant
+ - Fr1nkbot
+ - Glenn F.
+ - Chris C.
 
 // ===================================================== //
