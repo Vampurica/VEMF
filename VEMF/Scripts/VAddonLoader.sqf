@@ -10,10 +10,11 @@
 		\VEMF\Addons\Caves\init.sqf
 */
 
+if (isNil "VEMFLock") then {VEMFLock = true;};
 if (VEMFLock) exitWith {};
 
 // Time Lock
-if (round(serverTime/60) > 5) exitWith {
+if ((diag_tickTime/60) > 5) exitWith {
 	diag_log text format ["[VEMF]: Warning: Addon Loader Ran Twice!"];
 	VEMFLock = true;
 	VEMFAddon = nil;
