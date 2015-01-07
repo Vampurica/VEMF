@@ -38,21 +38,22 @@ createCenter RESISTANCE;
 CIVILIAN setFriend [RESISTANCE,0];
 RESISTANCE setFriend [CIVILIAN,0];
 
-//diag_log text format ["[VEMF]: Looking for the Config. Ignore the associated File Not Found error."];
+diag_log text format ["[VEMF]: Looking for the Config. Ignore the associated File Not Found error."];
 
 // Let's Load the Mission Configuration
 // This code checks for a config file in the Mission Root before using the Addon Config
 // A "File Not Found" Error is to be expected if it doesn't exist.
-//_mConfig = preprocessFileLineNumbers "VEMFConfig.sqf";
-//if (_mConfig != '') then {
+_mConfig = preprocessFileLineNumbers "VEMFConfig.sqf";
+diag_log text format ["[VEMF]: Loading Configuration File."];
+if (_mConfig != '') then {
 	// Config is in the Mission
-	//_mConfig = nil; // Kill Var
-	//call compile preprocessFileLineNumbers "VEMFConfig.sqf";
-//} else {
+	_mConfig = nil; // Kill Var
+	call compile preprocessFileLineNumbers "VEMFConfig.sqf";
+} else {
 	// Use the Config in the Addon
-	//_mConfig = nil; // Kill Var
+	_mConfig = nil; // Kill Var
 	call compile preprocessFileLineNumbers "\VEMF\VEMFConfig.sqf";
-//};
+};
 
 // Report the version
 diag_log text format ["[VEMF]: Currently Running Version: %1", VEMFVersion];
