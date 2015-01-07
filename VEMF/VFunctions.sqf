@@ -196,7 +196,7 @@ VEMFHousePositions = {
 				// All Positions Found
 				_loop = false;
 			} else {
-				_tmpArr = _tmpArr + _bPos;
+				_tmpArr = _tmpArr + [_bPos];
 				_bNum = _bNum + 1;
 			};
 		};
