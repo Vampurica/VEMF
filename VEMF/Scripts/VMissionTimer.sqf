@@ -10,6 +10,7 @@ private ["_timeDiff","_missVar"];
 // Find the Min and Max time
 _timeDiff = ((VEMFMaxMissTime*60) - (VEMFMinMissTime*60));
 
+diag_log text format ["[VEMF]: Mission Timer Started."];
 
 while {true} do {
 	// Wait a Random Amount

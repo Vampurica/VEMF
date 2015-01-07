@@ -5,6 +5,8 @@
 		This script checks VEMFAI to see if they need cached or unCached.
 */
 
+diag_log text format ["[VEMF]: AI Watchdog Running."];
+
 [] spawn {
 	private ["_cache","_cGrp","_pos"];
 	
