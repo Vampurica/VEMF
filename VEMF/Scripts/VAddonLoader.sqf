@@ -11,14 +11,9 @@
 */
 
 if (isNil "VEMFLock") then {VEMFLock = true;};
-if (VEMFLock) exitWith {};
+if (VEMFLock || isNil "VEMFAddon") exitWith {};
 
-// Time Lock
-if ((diag_tickTime/60) > 5) exitWith {
-	diag_log text format ["[VEMF]: Warning: Addon Loader Ran Twice!"];
-	VEMFLock = true;
-	VEMFAddon = nil;
-};
+diag_log text format ["[VEMF]: Loading Any Addons."];
 
 {
 	if (_x != "") then {
