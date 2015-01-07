@@ -43,26 +43,16 @@ diag_log text format ["[VEMF]: Looking for the Config. Ignore the associated Fil
 // Let's Load the Mission Configuration
 // This code checks for a config file in the Mission Root before using the Addon Config
 // A "File Not Found" Error is to be expected if it doesn't exist.
-_mConfig = preprocessFileLineNumbers "VEMFConfig.sqf";
-if (_mConfig != '') then {
+//_mConfig = preprocessFileLineNumbers "VEMFConfig.sqf";
+//if (_mConfig != '') then {
 	// Config is in the Mission
-	_mConfig = nil; // Kill Var
-	call compile preprocessFileLineNumbers "VEMFConfig.sqf";
-} else {
+	//_mConfig = nil; // Kill Var
+	//call compile preprocessFileLineNumbers "VEMFConfig.sqf";
+//} else {
 	// Use the Config in the Addon
-	_mConfig = nil; // Kill Var
+	//_mConfig = nil; // Kill Var
 	call compile preprocessFileLineNumbers "\VEMF\VEMFConfig.sqf";
-};
-_aiConfig = preprocessFileLineNumbers "VEMFAIConfig.sqf";
-if (_aiConfig != '') then {
-	// Config is in the Mission
-	_aiConfig = nil; // Kill Var
-	call compile preprocessFileLineNumbers "VEMFAIConfig.sqf";
-} else {
-	// Use the Config in the Addon
-	_aiConfig = nil; // Kill Var
-	call compile preprocessFileLineNumbers "\VEMF\VEMFAIConfig.sqf";
-};
+//};
 
 // Report the version
 diag_log text format ["[VEMF]: Currently Running Version: %1", VEMFVersion];
@@ -76,7 +66,7 @@ diag_log text format ["[VEMF]: Configurations Loaded."];
 diag_log text format["[VEMF]: Server is Running Map: %1", (toLower format ["%1", worldName])];
 
 // Lets load our functions
-call compile preprocessFileLineNumbers "\VEMF\Scripts\VFunctions.sqf";
+call compile preprocessFileLineNumbers "\VEMF\VFunctions.sqf";
 
 // Let's Load any Addons
 VEMFLock = false;
