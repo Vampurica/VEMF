@@ -14,7 +14,7 @@ while {true} do {
 	_canTown = call VEMFFindTown;
 	_nearPlyr = {isPlayer _x} count ((_canTown select 1) nearEntities[["Epoch_Male_F", "Epoch_Female_F"], 800]) > 0;
 	
-	if (!nearPlyr) exitWith {
+	if (!_nearPlyr) exitWith {
 		// No Players Near Else Loop Again
 	};
 	
