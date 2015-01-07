@@ -32,8 +32,8 @@ VEMFMapCenter = {
 	*/
 	switch (_mapName) do {
 		/* Arma 3 Maps */
-		case "altis":{_centerPos = [15440, 15342, 0];_mapRadii = 17000;);
-		case "stratis":{_centerPos = [4042, 4093, 0];_mapRadii = 4100;);
+		case "altis":{_centerPos = [15440, 15342, 0];_mapRadii = 17000;};
+		case "stratis":{_centerPos = [4042, 4093, 0];_mapRadii = 4100;};
 
 		/* Arma 2 Maps (May Need Updating) */
 		case "chernarus":{_centerPos = [7100, 7750, 0];_mapRadii = 5500;};
@@ -381,7 +381,7 @@ VEMFLoadLoot = {
 	};
 	
 	// Load Random Loot Amount
-	for "_i" from 1 to (floor(random 4) + 1) do {
+	for "_i" from 1 to ((floor(random 4)) + 1) do {
 		_var = (VEMFLootList call BIS_fnc_selectRandom);
 		
 		switch (true) do {
@@ -396,7 +396,7 @@ VEMFLoadLoot = {
 
 // Alerts Players With a Random Radio Type
 VEMFBroadcast = {
-	private ["_msg","_eRads","_rad","_sent"];
+	private ["_msg","_eRads","_rad","_sent","_allUnits","_unit","_n"];
 	_msg = _this select 0;
 	_eRads = ["0","1","2","3","4","5","6","7","8","9"];
 	_eRads = _eRads call BIS_fnc_arrayShuffle;
