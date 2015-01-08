@@ -1,4 +1,4 @@
 "VEMFChatMsg" addPublicVariableEventHandler {
-	systemChat (_this select 0);
+	systemChat (_this select 1);
 	VEMFChatMsg = nil;
 };
