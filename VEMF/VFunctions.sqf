@@ -432,7 +432,7 @@ VEMFBroadcast = {
 		{
 			if ((_eRads select _curRad) in (assignedItems _x)) then {
 				VEMFChatMsg = _msg;
-				(owner (vehicle _unit)) publicVariableClient "VEMFChatMsg";
+				(owner (vehicle _x)) publicVariableClient "VEMFChatMsg";
 				_sent = true;
 			};
 		} forEach _allUnits;
@@ -454,7 +454,7 @@ VEMFNearWait = {
 	_rad = _this select 1;
 	
 	while {true} do {
-		if ((_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], _rad]) > 0) exitWith {};
+		if ((count(_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], _rad])) > 0) exitWith {};
 		uiSleep 5;
 	};
 	
