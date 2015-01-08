@@ -98,7 +98,7 @@ if (_SorR) then
 				_unit enableAI "FSM";
 				
 				// Prepare for Cleanup or Caching
-				_unit addEventHandler ["Local",{ [(_this select 0), (_this select 1)] ExecVM VEMFLocalHandler; }];
+				//_unit addEventHandler ["Local",{ [(_this select 0), (_this select 1)] ExecVM VEMFLocalHandler; }];
 				_unit addEventHandler ["Killed",{ [(_this select 0), (_this select 1)] ExecVM VEMFAIKilled; }];
 				_unit setVariable ["VEMFUArray", _arrName];
 				_unit setVariable ["VEMFAI", true];
@@ -169,7 +169,7 @@ if (_SorR) then
 			_unit enableAI "FSM";
 			
 			// Prepare for Cleanup or Caching
-			_unit addEventHandler ["Local",{ [(_this select 0), (_this select 1)] ExecVM VEMFLocalHandler; }];
+			//_unit addEventHandler ["Local",{ [(_this select 0), (_this select 1)] ExecVM VEMFLocalHandler; }];
 			_unit addEventHandler ["Killed",{ [(_this select 0), (_this select 1)] ExecVM VEMFAIKilled; }];
 			_unit setVariable ["VEMFUArray", _arrName];
 			_unit setVariable ["VEMFAI", true];
@@ -226,7 +226,7 @@ if (_SorR) then
 		_unit enableAI "FSM";
 		
 		// Prepare for Cleanup or Caching
-		_unit addEventHandler ["Local",{ [(_this select 0), (_this select 1)] ExecVM VEMFLocalHandler; }];
+		//_unit addEventHandler ["Local",{ [(_this select 0), (_this select 1)] ExecVM VEMFLocalHandler; }];
 		_unit addEventHandler ["Killed",{ [(_this select 0), (_this select 1)] ExecVM VEMFAIKilled; }];
 		_unit setVariable ["VEMFUArray", _arrName];
 		_unit setVariable ["VEMFAI", true];
@@ -260,6 +260,6 @@ if (_SorR) then
 call compile format["
 	if (isNil '%1') then {%1 = [];};
 	{
-		%1 = %1 + (units (_grpArr select _forEachIndex));
+		%1 = %1 + (units _x);
 	} forEach _grpArr;
 ", _arrName];
