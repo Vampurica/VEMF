@@ -145,8 +145,7 @@ VEMFFindTown = {
 
 	// Get a list of towns
 	// Shouldn't cause lag because of the infrequency it runs (Needs Testing)
-	//_townArr = nearestLocations [_cntr, ["NameVillage","NameCity","NameCityCapital"], 30000];
-	_townArr = nearestLocations [_cntr, ["NameVillage"], 30000];
+	_townArr = nearestLocations [_cntr, ["NameCity","NameCityCapital"], 30000];
 	
 	// Pick a random town
 	_sRandomTown = _townArr call BIS_fnc_selectRandom;
