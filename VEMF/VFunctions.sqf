@@ -384,14 +384,16 @@ VEMFLoadLoot = {
 	for "_i" from 1 to ((floor(random 4)) + 1) do {
 		_var = (VEMFLootList call BIS_fnc_selectRandom);
 		
-		switch (true) do {
-			case (_var in VEMFLootItems): { _crate addItemCargoGlobal [_var,(floor(random(3)))+1]; };
-			case (_var in VEMFLootMags): { _crate addMagazineCargoGlobal [_var,(floor(random(3)))+1]; };
+		if (!(_var in VEMFCrateBlacklist)) then {
+			switch (true) do {
+				case (_var in VEMFLootItems): { _crate addItemCargoGlobal [_var,(floor(random(3)))+1]; };
+				case (_var in VEMFLootMags): { _crate addMagazineCargoGlobal [_var,(floor(random(3)))+1]; };
+			};
 		};
 	};
 	
 	// Delay Cleanup
-	_crate setVariable["LAST_CHECK", (diag_tickTime + 600)];
+	_crate setVariable ["LAST_CHECK", (diag_tickTime + 600)];
 };
 
 // Alerts Players With a Random Radio Type

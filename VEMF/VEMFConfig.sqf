@@ -16,6 +16,18 @@ VEMFDebugLocs = false;
 VEMFDebugAI = false;
 VEMFDebugFunc = false;
 
+// Punish Players who Run Over AI?
+// Causes 10% Vehicle Damage per AI Runover
+VEMFPunishRunover = true;
+
+// Blacklist Crate Loot
+VEMFCrateBlacklist = [
+	"DemoCharge_Remote_Mag", "SatchelCharge_Remote_Mag", "ATMine_Range_Mag",
+	"ClaymoreDirectionalMine_Remote_Mag", "APERSMine_Range_Mag",
+	"APERSBoundingMine_Range_Mag", "SLAMDirectionalMine_Wire_Mag",
+	"APERSTripMine_Wire_Mag"
+];
+
 // Min & Max Mission Times (Will Be Made Better)
 // Time is in Minutes
 // Min Must Be Less Than Max
@@ -30,11 +42,6 @@ VEMFMissionArray = ["DynamicTownInvasion"];
 // Example: Caves.sqf
 VEMFAddon = [""];
 
-// Punish Players who Run Over AI?
-// Causes 10% Vehicle Damage per AI Runover
-VEMFPunishRunover = true;
-
-///////////////////////////////////////////////////////////////////
 // Blacklist Zone Array -- missions will not spawn in these areas
 // format: [[x,y,z],radius]
 // Ex: [[06325,07807,0],300] //Starry Sobor
