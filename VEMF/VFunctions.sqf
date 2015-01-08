@@ -402,7 +402,7 @@ VEMFBroadcast = {
 	_eRads = _eRads call BIS_fnc_arrayShuffle;
 	
 	if (typeName _msg != "STRING") then {
-		_msg = str(_msg);
+		_msg = str _msg;
 	};
 	
 	// Pick a Radio to Broadcast On
@@ -424,7 +424,7 @@ VEMFBroadcast = {
 		
 			if (isPlayer _unit) then {
 				if (_rad in (assignedItems _unit)) then {
-					VEMFChatMsg = [_msg];
+					VEMFChatMsg = _msg;
 					(owner (vehicle _unit)) publicVariableClient "VEMFChatMsg";
 					_sent = true;
 				};
