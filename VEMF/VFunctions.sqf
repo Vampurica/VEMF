@@ -396,18 +396,14 @@ VEMFLoadLoot = {
 
 // Alerts Players With a Random Radio Type
 VEMFBroadcast = {
-	private ["_msg","_eRads","_rad","_sent","_allUnits","_unit","_n"];
+	private ["_msg","_eRads","_sent","_allUnits","_curRad","_send"];
 	_msg = _this select 0;
-	_eRads = ["0","1","2","3","4","5","6","7","8","9"];
+	_eRads = ["EpochRadio0","EpochRadio1","EpochRadio2","EpochRadio3","EpochRadio4","EpochRadio5","EpochRadio6","EpochRadio7","EpochRadio8","EpochRadio9"];
 	_eRads = _eRads call BIS_fnc_arrayShuffle;
 	
 	if (typeName _msg != "STRING") then {
 		_msg = str _msg;
 	};
-	
-	// Pick a Radio to Broadcast On
-	_rad = _eRads call BIS_fnc_selectRandom;
-	_rad = "EpochRadio" + _rad;
 	
 	// Broadcast to Each Player
 	_sent = false;
@@ -416,29 +412,33 @@ VEMFBroadcast = {
 	// Remove Non-Players
 	{ if (!isPlayer _x) then {_allUnits = _allUnits - (_x);}; } forEach _allUnits;
 	
-	// Broadcast on Every Radio Randomly Until Someone Hears Us
-	{
-		_n = 0;
-		while {true} do {
-			_unit = (_allUnits select _n);
-		
-			if (isPlayer _unit) then {
-				if (_rad in (assignedItems _unit)) then {
-					VEMFChatMsg = _msg;
-					(owner (vehicle _unit)) publicVariableClient "VEMFChatMsg";
-					_sent = true;
-				};
+	_curRad = 0;
+	_send = false;
+	// Find a Radio to Broadcast To
+	while {true} do {
+		{
+			if ((_eRads select _curRad) in (assignedItems _x)) exitWith {
+				_send = true;
 			};
-			
-			if ((count _allUnits) == _n) exitWith {
-				// Through AllUnits
+			if (_forEachIndex == ((count _allUnits)-1)) then {
+				_curRad = _curRad + 1;
 			};
-		};
+		} forEach _allUnits;
 		
-		if (_sent == true) exitWith {
-			// We Broadcast to a Radio with Someone on it
-		};
-	} forEach _eRads;
+		if (_send) exitWith {};
+	};
+	
+	if (_send) then {
+		{
+			if ((_eRads select _curRad) in (assignedItems _x)) then {
+				VEMFChatMsg = _msg;
+				(owner (vehicle _unit)) publicVariableClient "VEMFChatMsg";
+				_sent = true;
+			};
+		} forEach _allUnits;
+	} else {
+		_sent = false;
+	};
 	
 	// Return if Message was Received by Someone
 	// If FALSE, Nobody has a Radio Equipped
