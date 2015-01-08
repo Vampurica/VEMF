@@ -40,11 +40,11 @@ while {true} do {
 		};
 	} forEach (_housePos select _houseNum);
 	
-	if ((count _housePos) == _houseNum) exitWith {
+	if (((count _housePos)-1) == _houseNum) exitWith {
 		// Got all Positions
 	};
 	
-	_housePos = _housePos + 1;
+	_houseNum = _houseNum + 1;
 };
 
 // Now we have Unit Positions, We Announce the Mission and Wait
