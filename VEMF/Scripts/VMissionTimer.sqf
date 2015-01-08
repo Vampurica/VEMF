@@ -24,5 +24,4 @@ while {true} do {
 	
 	// Run It
 	[] execVM format ["\VEMF\Missions\%1.sqf",_missVar];
-	diag_log text format ["[VEMF]: Mission Timer: Running Mission %1.", _missVar];
 };

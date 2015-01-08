@@ -9,6 +9,8 @@ if (!isNil "VEMFTownInvaded") exitWith {
 
 VEMFTownInvaded = true;
 
+diag_log text format ["[VEMF]: Running Dynamic Town Invasion Mission."];
+
 // Find A Town to Invade
 while {true} do {
 	_canTown = call VEMFFindTown;
