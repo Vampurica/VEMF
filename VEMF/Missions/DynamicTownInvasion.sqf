@@ -65,6 +65,8 @@ if (!_alert) exitWith {
 // Player is Near, so Spawn the Units
 [_sqdPos,false,1,"VEMFDynInv"] ExecVM VEMFSpawnAI;
 
+waitUntil{!isNil "VEMFDynInv"};
+
 // Wait for Mission Completion
 [(_canTown select 1),"VEMFDynInv"] call VEMFWaitMissComp;
 
