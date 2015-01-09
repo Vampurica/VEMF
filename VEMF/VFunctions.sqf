@@ -167,7 +167,7 @@ VEMFHousePositions = {
 	_cnt = _this select 1;
 	
 	// Get Nearby Houses in Array
-	_houseArr = nearestObjects [_pos, ["house"], 300];
+	_houseArr = nearestObjects [_pos, ["house"], 200];
 	
 	{
 		if (str _houseArr == "[0,0,0]") then {
@@ -350,6 +350,11 @@ VEMFLoadAIGear = {
 		_unit addWeapon _prim;
 		_unit selectWeapon _prim;
 		_unit addWeapon _seco;
+		
+		// Add Grenades for GL Units
+		if (_prim in ["arifle_Katiba_GL_F","arifle_MX_GL_F","arifle_TRG21_GL_F","arifle_Mk20_GL_F","arifle_Mk20_GL_plain_F","arifle_MX_GL_Black_F"]) then {
+			_unit addMagazine "1Rnd_HE_Grenade_shell";
+		};
 		
 		if (VEMFDebugFunc) then {
 			diag_log text format ["[VEMF]: LoadGear: Uniform: %1 / Vest: %2 / Hat: %3 / Weps: %4 / Mags: %5", (uniform _unit), (vest _unit), (headgear _unit), (weapons _unit), (magazines _unit)];
