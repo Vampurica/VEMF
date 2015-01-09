@@ -367,6 +367,10 @@ VEMFLoadLoot = {
 	_crate = _this select 0;
 	
 	if (isNil "VEMFLootList") then {
+		VEMFLootList = [];
+		VEMFLootItems = [];
+		VEMFLootMags = [];
+		
 		// Generate Loot
 		{
 			VEMFLootItems = VEMFLootItems + (getArray(_x >> 'items'));
