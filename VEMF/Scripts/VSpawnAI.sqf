@@ -23,7 +23,8 @@
 			The amount of groups you want.
 			If you supply a group count, and 1 is True, you will get one group spawned at each position.
 */
-private ["_posArr","_SorR","_skill","_arrName","_grpCount","_sldrClass","_unitsPerGrp","_owner","_grp","_newPos","_grpArr","_unit","_pos"];
+private ["_posArr","_SorR","_skill","_arrName","_grpCount","_sldrClass","_unitsPerGrp","_owner","_grp","_newPos",
+"_grpArr","_unit","_pos","_waypoints","_wp","_cyc"];
 
 _posArr   = _this select 0;
 _SorR     = _this select 1;
@@ -31,15 +32,12 @@ _skill    = _this select 2;
 _arrName  = _this select 3;
 _grpCount = _this select 4;
 
-if ((typeName _posArr) != "ARRAY") exitWith { /* Not an Array */ };
-if ((typeName _SorR) != "BOOLEAN") exitWith { /* Not True/False */ };
-// Skills are Hardcoded ATM
-// if ((typeName _skill) != "SCALAR") exitWith { /* Not a Number */ };
-if ((typeName _arrName) != "STRING") exitWith { /* Not a String */ };
-if ((_SorR) && ((isNil "_grpCount") || (_grpCount < 1))) exitWith {
-	diag_log text format ["[VEMF]: Warning: AI Spawn: Strict Distribution Called Without Group Count!"];
-};
+if (isNil "_grpCount") then {_grpCount = 0;};
 
+if (VEMFDebugAI) then {
+	diag_log text format ["[VEMF]: AI Spawn Vars: %1 / %2 / %3 / %4 / %5", str _posArr, _SorR, _skill, _arrName, _grpCount];
+};
+	
 _sldrClass = "I_Soldier_EPOCH";
 _unitsPerGrp = 4;
 
@@ -115,7 +113,9 @@ if (_SorR) then
 			};
 		} forEach _posArr;
 
-		//diag_log text format ["[VEMF]: AI Debug: Spawned %1 Units at Grid %2", (_grpCount*_unitsPerGrp), (mapGridPosition _pos)];
+		if (VEMFDebugAI) then {
+			diag_log text format ["[VEMF]: AI Debug: Spawned %1 Units at Grid %2", (_grpCount*_unitsPerGrp), (mapGridPosition _pos)];
+		};
 		
 	} else {
 	
@@ -185,7 +185,9 @@ if (_SorR) then
 			//_unit setOwner _owner;
 		};
 		
-		//diag_log text format ["[VEMF]: AI Debug: Spawned %1 Units at Grid %2", (_grpCount*_unitsPerGrp), (mapGridPosition _pos)];
+		if (VEMFDebugAI) then {
+			diag_log text format ["[VEMF]: AI Debug: Spawned %1 Units at Grid %2", (_grpCount*_unitsPerGrp), (mapGridPosition _pos)];
+		};
 	};
 
 } else {
@@ -253,8 +255,33 @@ if (_SorR) then
 		//_unit setOwner (owner _owner);
 	} forEach _posArr;
 	
-	//diag_log text format ["[VEMF]: AI Debug: Spawned %1 Units near Grid %2", (count _posArr), (mapGridPosition _pos)];
+	if (VEMFDebugAI) then {
+		diag_log text format ["[VEMF]: AI Debug: Spawned %1 Units near Grid %2", (count _posArr), (mapGridPosition _pos)];
+	};
 };
+
+if (isNil "_grpArr") exitWith {};
+
+// Waypoints
+_waypoints = [
+	[(_pos select 0), (_pos select 1)+100, 0],
+	[(_pos select 0)+100, (_pos select 1), 0],
+	[(_pos select 0), (_pos select 1)-100, 0],
+	[(_pos select 0)-100, (_pos select 1), 0]
+];
+
+// Make them Patrol
+{
+	for "_z" from 0 to ((count _waypoints)-1) do {
+		_wp = _x addWaypoint [(_waypoints select _z), 10];
+		_wp setWaypointType "SAD";
+		_wp setWaypointCompletionRadius 20;
+	};
+	
+	_cyc = _x addWaypoint [_pos,10];
+	_cyc setWaypointType "CYCLE";
+	_cyc setWaypointCompletionRadius 20;
+} forEach _grpArr;
 
 // Add the Units to a Mission Var to track completion.
 call compile format["
