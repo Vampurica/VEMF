@@ -167,7 +167,7 @@ VEMFHousePositions = {
 	_cnt = _this select 1;
 	
 	// Get Nearby Houses in Array
-	_houseArr = nearestObjects [_pos, ["house"], 150];
+	_houseArr = nearestObjects [_pos, ["house"], 300];
 	
 	{
 		if (str _houseArr == "[0,0,0]") then {
@@ -496,6 +496,8 @@ VEMFWaitMissComp = {
 	};
 	
     call compile format["waitUntil{ uiSleep 1; ({isPlayer _x && _x distance _objective <= 30} count playableUnits > 0) && (count %1 <= (_numSpawned - _numKillReq));};",_unitArrayName];
+	
+	diag_log text format ["[VEMF]: WaitMissComp: Waiting Over. %1 Completed.", _unitArrayName];
 };
 
 /* ================================= End Of Functions ================================= */

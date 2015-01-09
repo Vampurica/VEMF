@@ -70,7 +70,7 @@ if (!(isNil "VEMFDynInvKiller")) then {
 	(owner (vehicle VEMFDynInvKiller)) publicVariableClient "VEMFChatMsg";
 	VEMFDynKiller = nil;
 	
-	_crate = createVehicle ["Land_PaperBox_C_EPOCH",(_canTown select 1),[],0,"CAN_COLLIDE"];
+	_crate = createVehicle ["Land_PaperBox_C_EPOCH",([(_canTown select 1),0,10,60,0,20,0] call BIS_fnc_findSafePos),[],0,"CAN_COLLIDE"];
 	_crate setVariable ["VEMFScenery", true];
 	[_crate] call VEMFLoadLoot;
 };

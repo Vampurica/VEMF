@@ -23,6 +23,11 @@ if (_killer isKindOf "Man") then {
 		} forEach (units group _unit);
 		(group _unit) setFormDir ([(leader group _unit), _killer] call BIS_fnc_dirTo);
 		
+		// Move Towards Gunshots
+		if (((leader group _unit) distance _killer) <= 200) then {
+			(group _unit) doMove (getPos _killer);
+		};
+		
 		// Report to Mission about Killer
 		call compile format["
 			if (isNil '%1') then {%1 = [];};
@@ -73,7 +78,7 @@ if ((count (units group _unit)) > 1) then {
 	if ((leader group _unit) == _unit) then {
 		_grpUnits = units group _unit;
 		_grpUnits = _grpUnits - [_unit];
-		(group _unit) setLeader (_grpUnits call BIS_fnc_selectRandom;);
+		(group _unit) setLeader (_grpUnits call BIS_fnc_selectRandom);
 		(leader group _unit) setSkill 1;
 	};
 };

@@ -264,10 +264,10 @@ if (isNil "_grpArr") exitWith {};
 
 // Waypoints
 _waypoints = [
-	[(_pos select 0), (_pos select 1)+100, 0],
-	[(_pos select 0)+100, (_pos select 1), 0],
-	[(_pos select 0), (_pos select 1)-100, 0],
-	[(_pos select 0)-100, (_pos select 1), 0]
+	[(_pos select 0), (_pos select 1)+50, 0],
+	[(_pos select 0)+50, (_pos select 1), 0],
+	[(_pos select 0), (_pos select 1)-50, 0],
+	[(_pos select 0)-50, (_pos select 1), 0]
 ];
 
 // Make them Patrol
