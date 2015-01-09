@@ -1,7 +1,7 @@
 /*
 	Dynamic Town Invasion Mission by Vampire
 */
-private ["_canTown","_nearPlyr","_grpCnt","_housePos","_houseNum","_sqdPos","_msg","_alert","_winMsg","_crate"];
+private ["_canTown","_nearPlyr","_grpCnt","_housePos","_sqdPos","_msg","_alert","_winMsg","_crate"];
 
 if (!isNil "VEMFTownInvaded") exitWith {
 	// Town Already Under Occupation
@@ -30,24 +30,17 @@ _grpCnt = 5;
 // Format: [POS, HouseCount]
 _housePos = [(_canTown select 1), _grpCnt] call VEMFHousePositions;
 
-_houseNum = 0;
 _sqdPos = [];
-while {true} do {
-	{
-		// 4 Units to a Squad. One Squad Leader.
-		if (!(count _x <= 4)) then {
-			_sqdPos = _sqdPos + (_x resize 4);
-		} else {
-			_sqdPos = _sqdPos + _x;
-		};
-	} forEach (_housePos select _houseNum);
-	
-	if (((count _housePos)-1) == _houseNum) exitWith {
-		// Got all Positions
+{
+	// 4 Units to a Squad. One Squad Leader.
+	if (!(count _x <= 4)) then {
+		_x resize 4;
+		_sqdPos = _sqdPos + _x;
+	} else {
+		_sqdPos = _sqdPos + _x;
 	};
-	
-	_houseNum = _houseNum + 1;
-};
+} forEach _housePos;
+
 
 // Now we have Unit Positions, We Announce the Mission and Wait
 _msg = format ["We have spotted hostile fireteams in %1! We'll give you some supplies if you can liberate the town.", (_canTown select 0)];
