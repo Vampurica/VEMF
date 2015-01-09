@@ -25,7 +25,7 @@ if (_killer isKindOf "Man") then {
 		
 		// Move Towards Gunshots
 		if (((leader group _unit) distance _killer) <= 200) then {
-			(group _unit) doMove (getPos _killer);
+			(group _unit) move (getPos _killer);
 		};
 		
 		// Report to Mission about Killer
@@ -78,7 +78,7 @@ if ((count (units group _unit)) > 1) then {
 	if ((leader group _unit) == _unit) then {
 		_grpUnits = units group _unit;
 		_grpUnits = _grpUnits - [_unit];
-		(group _unit) setLeader (_grpUnits call BIS_fnc_selectRandom);
+		(group _unit) selectLeader (_grpUnits call BIS_fnc_selectRandom);
 		(leader group _unit) setSkill 1;
 	};
 };
