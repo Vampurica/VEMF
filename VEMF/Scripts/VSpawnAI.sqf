@@ -12,25 +12,27 @@
 	Usage: [_positionArray, True, SkillLvl, GroupCount] call VEMFSpawnAI;
 		
 	Variables:
-		0: Position Array (1 Unit Per Position)
-		1: BOOLEAN - (True) Strict or (False) Rough Group Leader Assignments?
+		0: Mission Position Center
+		1: Position Array (1 Unit Per Position)
+		2: BOOLEAN - (True) Strict or (False) Rough Group Leader Assignments?
 			Strict will keep groups to your specifications,
 			Rough will spawn a unit at each position and group them more passively.
 			- Use Strict For Spawning En-Mass, and Rough for Fine Positioning
-		2: Skill Level Max (1-4)
-		3: Group Name
-		4: Group Count (Optional) required if 1 is True.
+		3: Skill Level Max (1-4)
+		4: Group Name
+		5: Group Count (Optional) required if 1 is True.
 			The amount of groups you want.
 			If you supply a group count, and 1 is True, you will get one group spawned at each position.
 */
 private ["_posArr","_SorR","_skill","_arrName","_grpCount","_sldrClass","_unitsPerGrp","_owner","_grp","_newPos",
-"_grpArr","_unit","_pos","_waypoints","_wp","_cyc"];
+"_grpArr","_unit","_pos","_waypoints","_wp","_cyc","_unitArr"];
 
-_posArr   = _this select 0;
-_SorR     = _this select 1;
-_skill    = _this select 2;
-_arrName  = _this select 3;
-_grpCount = _this select 4;
+_pos      = _this select 0;
+_posArr   = _this select 1;
+_SorR     = _this select 2;
+_skill    = _this select 3;
+_arrName  = _this select 4;
+_grpCount = _this select 5;
 
 if (isNil "_grpCount") then {_grpCount = 0;};
 
@@ -40,6 +42,7 @@ if (VEMFDebugAI) then {
 	
 _sldrClass = "I_Soldier_EPOCH";
 _unitsPerGrp = 4;
+_grpArr = [];
 
 // We need to do this two very different ways depending on Strict or Rough Distribution
 if (_SorR) then
@@ -70,7 +73,6 @@ if (_SorR) then
 				
 				if (count (units _grp) == _unitsPerGrp) then {
 					// Fireteam is Full, Create a New Group
-					_grpArr = [];
 					_grpArr = _grpArr + [_grp];
 					_grp = grpNull;
 					_grp = createGroup RESISTANCE;
@@ -120,12 +122,6 @@ if (_SorR) then
 	} else {
 	
 		// We have a single POS given.
-		// Check for a nested array
-		if (typeName (_posArr select 0) != "SCALAR") then {
-			_pos = _posArr select 0;
-		} else {
-			_pos = _posArr;
-		};
 		
 		// Find the Owner
 		//_owner = owner ((_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) select 0);
@@ -143,7 +139,6 @@ if (_SorR) then
 			
 			if (count (units _grp) == _unitsPerGrp) then {
 				// Fireteam is Full, Create a New Group
-				_grpArr = [];
 				_grpArr = _grpArr + [_grp];
 				_grp = grpNull;
 				_grp = createGroup RESISTANCE;
@@ -198,9 +193,6 @@ if (_SorR) then
 		diag_log text format ["[VEMF]: Warning: AI Spawn: Rough Distribution Requires Multiple Positions!"];
 	};
 	
-	// Only used for the log
-	_pos = _posArr select 0;
-	
 	// Find the Owner
 	//_owner = owner ((_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) select 0);
 	
@@ -238,16 +230,23 @@ if (_SorR) then
 		// Logic is that group positions come in via houses
 		// Therefore separate them to one group per house
 		if (_forEachIndex != 0) then {
-			if ((_x distance (_posArr select (_forEachIndex-1))) > 25) then {
+			if ((_x distance (_posArr select (_forEachIndex-1))) > 40) then {
 				// Too Far, Need New Group
 				_unit setSkill 1;
 				_grp selectLeader _unit;
-				_grpArr = [];
 				_grpArr = _grpArr + [_grp];
 				_grp = grpNull;
 				_grp = createGroup RESISTANCE;
 				_grp setBehaviour "AWARE";
 				_grp setCombatMode "RED";
+			};
+		};
+		
+		if (_forEachIndex == ((count(_posArr))-1)) then {
+			_unit setSkill 1;
+			_grp selectLeader _unit;
+			if (!(_grp in _grpArr)) then {
+				_grpArr = _grpArr + [_grp];
 			};
 		};
 		
@@ -260,7 +259,7 @@ if (_SorR) then
 	};
 };
 
-if (isNil "_grpArr") exitWith {};
+if (count _grpArr < 1) exitWith {};
 
 // Waypoints
 _waypoints = [
@@ -283,10 +282,12 @@ _waypoints = [
 	_cyc setWaypointCompletionRadius 20;
 } forEach _grpArr;
 
+_unitArr = [];
+{
+	_unitArr = _unitArr + (units _x);
+} forEach _grpArr;
+
 // Add the Units to a Mission Var to track completion.
 call compile format["
-	if (isNil '%1') then {%1 = [];};
-	{
-		%1 = %1 + (units _x);
-	} forEach _grpArr;
+	%1 = _unitArr;
 ", _arrName];

@@ -24,7 +24,7 @@ while {true} do {
 };
 
 // Group Count
-_grpCnt = 5;
+_grpCnt = 3;
 
 // We Found a Town with No Players. Let's Invade.
 // Format: [POS, HouseCount]
@@ -56,7 +56,7 @@ if (!_alert) exitWith {
 [(_canTown select 1),1000] call VEMFNearWait;
 
 // Player is Near, so Spawn the Units
-[_sqdPos,false,1,"VEMFDynInv"] ExecVM VEMFSpawnAI;
+[(_canTown select 1),_sqdPos,false,1,"VEMFDynInv"] ExecVM VEMFSpawnAI;
 
 waitUntil{!isNil "VEMFDynInv"};
 
@@ -78,6 +78,7 @@ if (!(isNil "VEMFDynInvKiller")) then {
 // Clean Up Remaining AI
 if (count VEMFDynInv > 0) then {
 	{ deleteVehicle _x } forEach VEMFDynInv;
+	VEMFDynInv = nil;
 };
 
 VEMFTownInvaded = nil;
