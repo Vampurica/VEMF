@@ -370,6 +370,7 @@ VEMFLoadLoot = {
 		VEMFLootList = [];
 		VEMFLootItems = [];
 		VEMFLootMags = [];
+		VEMFLootWeps = [];
 		
 		// Generate Loot
 		{
@@ -381,6 +382,11 @@ VEMFLoadLoot = {
 			VEMFLootMags = VEMFLootMags + (getArray(_x >> 'items'));
 			VEMFLootList = VEMFLootList + (getArray(_x >> 'items'));
 		} forEach ("getText(_x >> 'itemType') == 'magazine'" configClasses (configFile >> "CfgLootTable"));
+		
+		{
+			VEMFLootWeps = VEMFLootWeps + (getArray(_x >> 'items'));
+			VEMFLootList = VEMFLootList + (getArray(_x >> 'items'));
+		} forEach ("getText(_x >> 'itemType') == 'weapon'" configClasses (configFile >> "CfgLootTable"));
 	};
 	
 	// Load Random Loot Amount
@@ -388,9 +394,18 @@ VEMFLoadLoot = {
 		_var = (VEMFLootList call BIS_fnc_selectRandom);
 		
 		if (!(_var in VEMFCrateBlacklist)) then {
-			switch (true) do {
+			switch (true) do
+			{
 				case (_var in VEMFLootItems): { _crate addItemCargoGlobal [_var,(floor(random(3)))+1]; };
 				case (_var in VEMFLootMags): { _crate addMagazineCargoGlobal [_var,(floor(random(3)))+1]; };
+				case (_var in VEMFLootWeps): {
+					_crate addWeaponCargoGlobal [_var,1];
+					{
+						if (isClass(configFile >> "CfgPricing" >> _x)) exitWith {
+							_crate addMagazineCargoGlobal [_x,2];
+						};
+					} forEach (getArray (configFile >> "cfgWeapons" >> _var >> "magazines"));
+				};
 			};
 		};
 	};
