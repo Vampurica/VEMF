@@ -73,12 +73,8 @@ if ((count (units group _unit)) > 1) then {
 	if ((leader group _unit) == _unit) then {
 		_grpUnits = units group _unit;
 		_grpUnits = _grpUnits - [_unit];
-		{
-			if (Alive _x) exitWith {
-				(group _unit) setLeader _x;
-				_x setSkill 1;
-			};
-		} forEach _grpUnits;
+		(group _unit) setLeader (_grpUnits call BIS_fnc_selectRandom;);
+		(leader group _unit) setSkill 1;
 	};
 };
 
