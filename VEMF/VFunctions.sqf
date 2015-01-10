@@ -170,13 +170,17 @@ VEMFHousePositions = {
 	_houseArr = nearestObjects [_pos, ["house"], 200];
 	
 	{
-		if (str _houseArr == "[0,0,0]") then {
+		if (str(getPos _x) == "[0,0,0]") then {
 			// Not a Valid House
+			_houseArr = _houseArr - [_x];
+		};
+		if (str(_x buildingPos 0) == "[0,0,0]") then {
 			_houseArr = _houseArr - [_x];
 		};
 	} forEach _houseArr;
 	
 	// Randomize Valid Houses
+	if (count _houseArr > 20) then { _houseArr resize 20; };
 	_houseArr = _houseArr call BIS_fnc_arrayShuffle;
 	
 	// Only return the amount of houses we wanted
@@ -415,8 +419,12 @@ VEMFLoadLoot = {
 		};
 	};
 	
+	if (VEMFDebugFunc) then {
+		diag_log text format ["[VEMF]: LoadLoot: Weps: %1 / Mags: %2 / Items: %3 / Bags: %4", (weaponCargo _crate), (magazineCargo _crate), (itemCargo _crate), (backpackCargo _crate)];
+	};
+	
 	// Delay Cleanup
-	_crate setVariable ["LAST_CHECK", (diag_tickTime + 600)];
+	_crate setVariable ["LAST_CHECK", (diag_tickTime + 1800)];
 };
 
 // Alerts Players With a Random Radio Type
@@ -488,7 +496,7 @@ VEMFNearWait = {
 
 // Waits for the Mission to be Completed
 VEMFWaitMissComp = {
-    private ["_objective","_unitArrayName","_numSpawned","_numKillReq"];
+    private ["_objective","_unitArrayName","_numSpawned","_numKillReq","_missDone"];
 	
     _objective = _this select 0;
     _unitArrayName = _this select 1;
@@ -496,11 +504,20 @@ VEMFWaitMissComp = {
     call compile format["_numSpawned = count %1;",_unitArrayName];
     _numKillReq = ceil(VEMFRequiredKillPercent * _numSpawned);
 	
-	if (VEMFDebugFunc) then {
-		diag_log text format["[VEMF]: (%3) Waiting for %1/%2 Units or Less to be Alive and a Player to be Near the Objective.", (_numSpawned - _numKillReq), _numSpawned, _unitArrayName];
-	};
+	diag_log text format["[VEMF]: (%3) Waiting for %1/%2 Units or Less to be Alive and a Player to be Near the Objective.", (_numSpawned - _numKillReq), _numSpawned, _unitArrayName];
 	
-    call compile format["waitUntil{ uiSleep 1; ({isPlayer _x && _x distance _objective <= 30} count playableUnits > 0) && (count %1 <= (_numSpawned - _numKillReq));};",_unitArrayName];
+	_missDone = false;
+    call compile format["
+		while {true} do {
+			if (count %1 <= (_numSpawned - _numKillReq)) then {
+				if ((count(_objective nearEntities [['Epoch_Male_F', 'Epoch_Female_F'], 150])) > 0) then {
+					_missDone = true;
+				};
+			};
+			if (_missDone) exitWith {};
+			uiSleep 5;
+		};
+	", _unitArrayName];
 	
 	diag_log text format ["[VEMF]: WaitMissComp: Waiting Over. %1 Completed.", _unitArrayName];
 };
