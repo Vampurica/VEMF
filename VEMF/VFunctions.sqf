@@ -375,6 +375,9 @@ VEMFLoadLoot = {
 	
 	_crate = _this select 0;
 	
+	// Delay Cleanup
+	_crate setVariable ["LAST_CHECK", (diag_tickTime + 1800)];
+	
 	if (isNil "VEMFLootList") then {
 		VEMFLootList = [];
 		VEMFLootItems = [];
@@ -396,10 +399,14 @@ VEMFLoadLoot = {
 			VEMFLootWeps = VEMFLootWeps + (getArray(_x >> 'items'));
 			VEMFLootList = VEMFLootList + (getArray(_x >> 'items'));
 		} forEach ("getText(_x >> 'itemType') == 'weapon'" configClasses (configFile >> "CfgLootTable"));
+		
+		if (VEMFDebugFunc) then {
+			diag_log text format ["[VEMF]: LoadLoot: AllWeps:%1 / AllMags:%2 / AllItems:%3", str(VEMFLootWeps), str(VEMFLootMags), str(VEMFLootItems)];
+		};
 	};
 	
 	// Load Random Loot Amount
-	for "_i" from 1 to ((floor(random 4)) + 1) do {
+	for "_i" from 1 to ((floor(random 10)) + 1) do {
 		_var = (VEMFLootList call BIS_fnc_selectRandom);
 		
 		if (!(_var in VEMFCrateBlacklist)) then {
@@ -407,14 +414,7 @@ VEMFLoadLoot = {
 			{
 				case (_var in VEMFLootItems): { _crate addItemCargoGlobal [_var,(floor(random(3)))+1]; };
 				case (_var in VEMFLootMags): { _crate addMagazineCargoGlobal [_var,(floor(random(3)))+1]; };
-				case (_var in VEMFLootWeps): {
-					_crate addWeaponCargoGlobal [_var,1];
-					{
-						if (isClass(configFile >> "CfgPricing" >> _x)) exitWith {
-							_crate addMagazineCargoGlobal [_x,2];
-						};
-					} forEach (getArray (configFile >> "cfgWeapons" >> _var >> "magazines"));
-				};
+				case (_var in VEMFLootWeps): { _crate addWeaponCargoGlobal [_var,1]; };
 			};
 		};
 	};
@@ -422,9 +422,6 @@ VEMFLoadLoot = {
 	if (VEMFDebugFunc) then {
 		diag_log text format ["[VEMF]: LoadLoot: Weps: %1 / Mags: %2 / Items: %3 / Bags: %4", (weaponCargo _crate), (magazineCargo _crate), (itemCargo _crate), (backpackCargo _crate)];
 	};
-	
-	// Delay Cleanup
-	_crate setVariable ["LAST_CHECK", (diag_tickTime + 1800)];
 };
 
 // Alerts Players With a Random Radio Type
