@@ -5,13 +5,13 @@
 
 diag_log text "[VEMF]: Loading ExecVM Functions.";
 
-VEMFSpawnAI = "\VEMF\Scripts\VSpawnAI.sqf";
-VEMFAIKilled = "\VEMF\Scripts\VAIKilled.sqf";
+VEMFSpawnAI      = "\VEMF\Scripts\VSpawnAI.sqf";
+VEMFAIKilled     = "\VEMF\Scripts\VAIKilled.sqf";
 VEMFLocalHandler = "\VEMF\Scripts\VLocalEventhandler.sqf";
-VEMFGenRanWeps = "\VEMF\Scripts\VGenWeapons.sqf";
-VEMFLoadAddons = "\VEMF\Scripts\VAddonLoader.sqf";
+VEMFGenRanWeps   = "\VEMF\Scripts\VGenWeapons.sqf";
+VEMFLoadAddons   = "\VEMF\Scripts\VAddonLoader.sqf";
 VEMFMissWatchdog = "\VEMF\Scripts\VAIWatchdog.sqf";
-VEMFMissTimer = "\VEMF\Scripts\VMissionTimer.sqf";
+VEMFMissTimer    = "\VEMF\Scripts\VMissionTimer.sqf";
 
 diag_log text "[VEMF]: Loading Compiled Functions.";
 
