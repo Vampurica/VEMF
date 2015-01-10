@@ -403,13 +403,16 @@ VEMFLoadLoot = {
 	VEMFLootList = [VEMFLootList] call VEMFRemoveDups;
 	
 	// Load Random Loot Amount
-	for "_i" from 1 to ((floor(random 10)) + 1) do {
+	for "_i" from 1 to ((floor(random 4)) + 1) do {
 		_var = (VEMFLootList call BIS_fnc_selectRandom);
 		
 		if (!(_var in VEMFCrateBlacklist)) then {
 			switch (true) do
 			{
-				case (isClass (configFile >> "cfgWeapons" >> _var)): { _crate addItemCargoGlobal [_var,(floor(random(3)))+1]; };
+				case (isClass (configFile >> "cfgWeapons" >> _var)): {
+					if (!(_var in (itemCargo _crate))) then {
+						_crate addItemCargoGlobal [_var,(floor(random(3)))+1]; };
+					};
 				case (isClass (configFile >> "cfgMagazines" >> _var)): { _crate addMagazineCargoGlobal [_var,(floor(random(3)))+1]; };
 				case ((getText(configFile >> "cfgVehicles" >> _var >>  "vehicleClass")) == "Backpacks"): { _crate addBackpackCargoGlobal [_var,1]; };
 			};
@@ -437,7 +440,7 @@ VEMFBroadcast = {
 	_allUnits = allUnits;
 	
 	// Remove Non-Players
-	{ if (!isPlayer _x) then {_allUnits = _allUnits - (_x);}; } forEach _allUnits;
+	{ if !(isPlayer _x) then {_allUnits = _allUnits - (_x);}; } forEach _allUnits;
 	
 	_curRad = 0;
 	_send = false;
@@ -453,6 +456,10 @@ VEMFBroadcast = {
 		} forEach _allUnits;
 		
 		if (_send) exitWith {};
+		if (_curRad > ((count _eRads)-1)) exitWith
+		{
+			/* No Radios */
+		};
 	};
 	
 	if (_send) then {
