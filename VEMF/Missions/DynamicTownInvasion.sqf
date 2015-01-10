@@ -66,7 +66,7 @@ waitUntil{!isNil "VEMFDynInv"};
 // Rewards
 if (!(isNil "VEMFDynInvKiller")) then {
 	_winMsg = format ["%1 has been cleared! You can find your reward at the town center.", (_canTown select 0)];
-	VEMFChatMsg = [_winMsg];
+	VEMFChatMsg = _winMsg;
 	(owner (vehicle VEMFDynInvKiller)) publicVariableClient "VEMFChatMsg";
 	VEMFDynKiller = nil;
 	
