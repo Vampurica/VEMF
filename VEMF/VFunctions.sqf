@@ -34,6 +34,7 @@ VEMFMapCenter = {
 		/* Arma 3 Maps */
 		case "altis":{_centerPos = [15440, 15342, 0];_mapRadii = 17000;};
 		case "stratis":{_centerPos = [4042, 4093, 0];_mapRadii = 4100;};
+		case "bornholm":{_centerPos = [11240, 11292, 0];_mapRadii = 14400;};
 
 		/* Arma 2 Maps (May Need Updating) */
 		case "chernarus":{_centerPos = [7100, 7750, 0];_mapRadii = 5500;};
