@@ -2,7 +2,7 @@
 ================
 The Spiritual Successor of DZMS, programmed for Arma 3 Epoch.
 
-Current Version is Pre-Alpha v1.0.0
+Current Version is Pre-Alpha v1.0.0a
 
 If you want to support me, you can visit my Patreon at:
  > http://www.patreon.com/vampire
