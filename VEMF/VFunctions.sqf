@@ -371,39 +371,36 @@ VEMFLoadAIGear = {
 };
 
 VEMFLoadLoot = {
-	private ["_crate","_var"];
+	private ["_crate","_var","_tmp"];
 	
 	_crate = _this select 0;
 	
 	// Delay Cleanup
 	_crate setVariable ["LAST_CHECK", (diag_tickTime + 1800)];
 	
+	// Empty Crate
+	clearWeaponCargoGlobal _crate;
+	clearMagazineCargoGlobal _crate;
+	clearBackpackCargoGlobal  _crate;
+	clearItemCargoGlobal _crate;
+	
 	if (isNil "VEMFLootList") then {
 		VEMFLootList = [];
-		VEMFLootItems = [];
-		VEMFLootMags = [];
-		VEMFLootWeps = [];
 		
 		// Generate Loot
 		{
-			VEMFLootItems = VEMFLootItems + (getArray(_x >> 'items'));
-			VEMFLootList = VEMFLootList + (getArray(_x >> 'items'));
-		} forEach ("getText(_x >> 'itemType') == 'item'" configClasses (configFile >> "CfgLootTable"));
-		
-		{
-			VEMFLootMags = VEMFLootMags + (getArray(_x >> 'items'));
-			VEMFLootList = VEMFLootList + (getArray(_x >> 'items'));
-		} forEach ("getText(_x >> 'itemType') == 'magazine'" configClasses (configFile >> "CfgLootTable"));
-		
-		{
-			VEMFLootWeps = VEMFLootWeps + (getArray(_x >> 'items'));
-			VEMFLootList = VEMFLootList + (getArray(_x >> 'items'));
-		} forEach ("getText(_x >> 'itemType') == 'weapon'" configClasses (configFile >> "CfgLootTable"));
+			_tmp = (getArray(_x >> 'items'));
+			for "_z" from 0 to ((count(_tmp))-1) do {
+				VEMFLootList = VEMFLootList + [((_tmp select _z) select 0)];
+			};
+		} forEach ("getText(_x >> 'itemType') != 'weapon'" configClasses (configFile >> "CfgLootTable"));
 		
 		if (VEMFDebugFunc) then {
-			diag_log text format ["[VEMF]: LoadLoot: AllWeps:%1 / AllMags:%2 / AllItems:%3", str(VEMFLootWeps), str(VEMFLootMags), str(VEMFLootItems)];
+			diag_log text format ["[VEMF]: LoadLootArray: %1", str(VEMFLootList)];
 		};
 	};
+	
+	VEMFLootList = [VEMFLootList] call VEMFRemoveDups;
 	
 	// Load Random Loot Amount
 	for "_i" from 1 to ((floor(random 10)) + 1) do {
@@ -412,9 +409,9 @@ VEMFLoadLoot = {
 		if (!(_var in VEMFCrateBlacklist)) then {
 			switch (true) do
 			{
-				case (_var in VEMFLootItems): { _crate addItemCargoGlobal [_var,(floor(random(3)))+1]; };
-				case (_var in VEMFLootMags): { _crate addMagazineCargoGlobal [_var,(floor(random(3)))+1]; };
-				case (_var in VEMFLootWeps): { _crate addWeaponCargoGlobal [_var,1]; };
+				case (isClass (configFile >> "cfgWeapons" >> _var)): { _crate addItemCargoGlobal [_var,(floor(random(3)))+1]; };
+				case (isClass (configFile >> "cfgMagazines" >> _var)): { _crate addMagazineCargoGlobal [_var,(floor(random(3)))+1]; };
+				case ((getText(configFile >> "cfgVehicles" >> _var >>  "vehicleClass")) == "Backpacks"): { _crate addBackpackCargoGlobal [_var,1]; };
 			};
 		};
 	};
@@ -473,6 +470,20 @@ VEMFBroadcast = {
 	// Return if Message was Received by Someone
 	// If FALSE, Nobody has a Radio Equipped
 	_sent
+};
+
+VEMFRemoveDups = {
+	private ["_array","_tmpArr"];
+	
+	_array = _this select 0;
+	_tmpArr = _this select 0;
+	
+	{
+		_array = _array - [_x];
+		_array = _array + [_x];
+	} forEach _tmpArr;
+	
+	_array
 };
 
 // Waits for players to be within the radius of the position
