@@ -440,7 +440,7 @@ VEMFBroadcast = {
 	_allUnits = allUnits;
 	
 	// Remove Non-Players
-	{ if !(isPlayer _x) then {_allUnits = _allUnits - (_x);}; } forEach _allUnits;
+	{ if !(isPlayer _x) then {_allUnits = _allUnits - [_x];}; } forEach _allUnits;
 	
 	_curRad = 0;
 	_send = false;
