@@ -11,8 +11,8 @@ If you want to support me, you can visit my Patreon at:
 Installation
 --------------------------
 1.	Download the Github Zip folder and open it with your unPacker of choice.
-
-	> https://github.com/SMVampire/VEMF/archive/master.zip
+	You can find the newest release here:
+	> https://github.com/SMVampire/VEMF/releases
 	
 2.	Extract it to your Desktop or somewhere where you won't lose it.
 	Inside the Zip is this Readme.MD, and the folders "Binaries", "Changelogs", "Mission Files", and "VEMF".
