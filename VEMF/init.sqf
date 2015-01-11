@@ -37,10 +37,6 @@ diag_log text format ["[VEMF]: isServer:%1 / isDedicated:%2 / isMultiplayer:%3",
 // Let's set some relations up
 diag_log text format ["[VEMF]: Setting VEMF Relations to make AI Hostile."];
 
-createCenter RESISTANCE;
-CIVILIAN setFriend [RESISTANCE,0];
-RESISTANCE setFriend [CIVILIAN,0];
-
 diag_log text format ["[VEMF]: Looking for the Config. Ignore the associated File Not Found error."];
 
 // Let's Load the Mission Configuration
@@ -50,11 +46,9 @@ _mConfig = preprocessFileLineNumbers "VEMFConfig.sqf";
 diag_log text format ["[VEMF]: Loading Configuration File."];
 if (_mConfig != '') then {
 	// Config is in the Mission
-	_mConfig = nil; // Kill Var
-	call compile preprocessFileLineNumbers "VEMFConfig.sqf";
+	call compile _mConfig;
 } else {
 	// Use the Config in the Addon
-	_mConfig = nil; // Kill Var
 	call compile preprocessFileLineNumbers "\VEMF\VEMFConfig.sqf";
 };
 
