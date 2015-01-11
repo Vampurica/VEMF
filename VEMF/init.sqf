@@ -34,9 +34,6 @@ diag_log text format ["[VEMF]: Starting Vampire's Epoch Mission Framework."];
 // Debug. Should be True / True / True
 diag_log text format ["[VEMF]: isServer:%1 / isDedicated:%2 / isMultiplayer:%3", isServer, isDedicated, isMultiplayer];
 
-// Let's set some relations up
-diag_log text format ["[VEMF]: Setting VEMF Relations to make AI Hostile."];
-
 diag_log text format ["[VEMF]: Looking for the Config. Ignore the associated File Not Found error."];
 
 // Let's Load the Mission Configuration
