@@ -372,7 +372,7 @@ VEMFLoadAIGear = {
 };
 
 VEMFLoadLoot = {
-	private ["_crate","_var","_tmp","_kindOf"];
+	private ["_crate","_var","_tmp","_kindOf","_report","_cAmmo"];
 	
 	_crate = _this select 0;
 	
@@ -401,8 +401,9 @@ VEMFLoadLoot = {
 		};
 	};
 	
+	_report [];
 	// Load Random Loot Amount
-	for "_i" from 1 to ((floor(random 10)) + 20) do {
+	for "_i" from 1 to ((floor(random 10)) + 10) do {
 		_var = (VEMFLootList call BIS_fnc_selectRandom);
 		
 		if (!(_var in VEMFCrateBlacklist)) then {
@@ -414,6 +415,13 @@ VEMFLoadLoot = {
 						_crate addItemCargoGlobal [_var,1];
 					} else {
 						_crate addWeaponCargoGlobal [_var,1];
+						
+						_cAmmo = [] + getArray (configFile >> "cfgWeapons" >> _var >> "magazines");
+						{
+							if (isClass(configFile >> "CfgPricing" >> _x)) exitWith {
+								_crate addMagazineCargoGlobal [_x,2];
+							};
+						} forEach _cAmmo;
 					};
 				};
 				case (isClass (configFile >> "cfgMagazines" >> _var)): {
@@ -422,8 +430,15 @@ VEMFLoadLoot = {
 				case ((getText(configFile >> "cfgVehicles" >> _var >>  "vehicleClass")) == "Backpacks"): {
 					_crate addBackpackCargoGlobal [_var,1];
 				};
+				default {
+					_report = _report + [_var];
+				};
 			};
 		};
+	};
+	
+	if ((count _report) > 0) then {
+		diag_log text format ["[VEMF]: LoadLoot: <Unknown> %1", str _report];
 	};
 	
 	if (VEMFDebugFunc) then {
