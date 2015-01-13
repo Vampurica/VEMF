@@ -401,7 +401,7 @@ VEMFLoadLoot = {
 		};
 	};
 	
-	_report [];
+	_report = [];
 	// Load Random Loot Amount
 	for "_i" from 1 to ((floor(random 10)) + 10) do {
 		_var = (VEMFLootList call BIS_fnc_selectRandom);
