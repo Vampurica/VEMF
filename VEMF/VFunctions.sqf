@@ -385,7 +385,7 @@ VEMFLoadLoot = {
 	clearBackpackCargoGlobal  _crate;
 	clearItemCargoGlobal _crate;
 	
-	if (isNil "VEMFLootList") then {
+	if (VEMFDynCrate) then {
 		VEMFLootList = [];
 		
 		// Generate Loot
@@ -402,22 +402,26 @@ VEMFLoadLoot = {
 	};
 	
 	// Load Random Loot Amount
-	for "_i" from 1 to ((floor(random 4)) + 1) do {
+	for "_i" from 1 to ((floor(random 10)) + 20) do {
 		_var = (VEMFLootList call BIS_fnc_selectRandom);
 		
 		if (!(_var in VEMFCrateBlacklist)) then {
 			switch (true) do
 			{
 				case (isClass (configFile >> "CfgWeapons" >> _var)): {
-					_kindOf = [(configFile >> "CfgWeapons" >> _var),true ] call BIS_fnc_returnParents;
+					_kindOf = [(configFile >> "CfgWeapons" >> _var),true] call BIS_fnc_returnParents;
 					if ("ItemCore" in _kindOf) then {
-						_crate addItemCargoGlobal [_var,(floor(random(3)))+1];
+						_crate addItemCargoGlobal [_var,1];
 					} else {
 						_crate addWeaponCargoGlobal [_var,1];
 					};
 				};
-				case (isClass (configFile >> "cfgMagazines" >> _var)): { _crate addMagazineCargoGlobal [_var,(floor(random(3)))+1]; };
-				case ((getText(configFile >> "cfgVehicles" >> _var >>  "vehicleClass")) == "Backpacks"): { _crate addBackpackCargoGlobal [_var,1]; };
+				case (isClass (configFile >> "cfgMagazines" >> _var)): {
+					_crate addMagazineCargoGlobal [_var,1];
+				};
+				case ((getText(configFile >> "cfgVehicles" >> _var >>  "vehicleClass")) == "Backpacks"): {
+					_crate addBackpackCargoGlobal [_var,1];
+				};
 			};
 		};
 	};
@@ -482,6 +486,7 @@ VEMFBroadcast = {
 	_sent
 };
 
+// Removes Duplicate Array Entries (Doesn't Save Order)
 VEMFRemoveDups = {
 	private ["_array","_tmpArr"];
 	

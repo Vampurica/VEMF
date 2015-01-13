@@ -20,6 +20,16 @@ VEMFDebugFunc = false;
 // Causes 10% Vehicle Damage per AI Runover
 VEMFPunishRunover = true;
 
+// Dynamic Crate Loot?
+// Blacklist Still Applies
+VEMFDynCrate = true;
+
+// Crate Loot List
+// (DynCrate must be off)
+VEMFLootList = [
+	""
+];
+
 // Blacklist Crate Loot
 VEMFCrateBlacklist = [
 	"DemoCharge_Remote_Mag", "SatchelCharge_Remote_Mag", "ATMine_Range_Mag",
@@ -120,4 +130,4 @@ VEMFPistolsList = [
 
 /* ======== Do Not Modify Below ======== */
 diag_log text format ["[VEMF]: Configuration File Loaded!"];
-VEMFVersion = "1.0.0a-PreAlpha";
+VEMFVersion = "1.0.0b-PreAlpha";
