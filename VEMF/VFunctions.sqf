@@ -372,7 +372,7 @@ VEMFLoadAIGear = {
 };
 
 VEMFLoadLoot = {
-	private ["_crate","_var","_tmp"];
+	private ["_crate","_var","_tmp","_kindOf"];
 	
 	_crate = _this select 0;
 	
@@ -394,14 +394,12 @@ VEMFLoadLoot = {
 			for "_z" from 0 to ((count(_tmp))-1) do {
 				VEMFLootList = VEMFLootList + [((_tmp select _z) select 0)];
 			};
-		} forEach ("getText(_x >> 'itemType') != 'weapon'" configClasses (configFile >> "CfgLootTable"));
+		} forEach ("configName _x != 'Uniforms' && configName _x != 'Headgear'" configClasses (configFile >> "CfgLootTable"));
 		
 		if (VEMFDebugFunc) then {
 			diag_log text format ["[VEMF]: LoadLootArray: %1", str(VEMFLootList)];
 		};
 	};
-	
-	VEMFLootList = [VEMFLootList] call VEMFRemoveDups;
 	
 	// Load Random Loot Amount
 	for "_i" from 1 to ((floor(random 4)) + 1) do {
@@ -410,10 +408,14 @@ VEMFLoadLoot = {
 		if (!(_var in VEMFCrateBlacklist)) then {
 			switch (true) do
 			{
-				case (isClass (configFile >> "cfgWeapons" >> _var)): {
-					if (!(_var in (itemCargo _crate))) then {
-						_crate addItemCargoGlobal [_var,(floor(random(3)))+1]; };
+				case (isClass (configFile >> "CfgWeapons" >> _var)): {
+					_kindOf = [(configFile >> "CfgWeapons" >> _var),true ] call BIS_fnc_returnParents;
+					if ("ItemCore" in _kindOf) then {
+						_crate addItemCargoGlobal [_var,(floor(random(3)))+1];
+					} else {
+						_crate addWeaponCargoGlobal [_var,1];
 					};
+				};
 				case (isClass (configFile >> "cfgMagazines" >> _var)): { _crate addMagazineCargoGlobal [_var,(floor(random(3)))+1]; };
 				case ((getText(configFile >> "cfgVehicles" >> _var >>  "vehicleClass")) == "Backpacks"): { _crate addBackpackCargoGlobal [_var,1]; };
 			};
