@@ -1,0 +1,49 @@
+// ===================================================== //
+// ================= v1.0.0b Pre-Alpha ================= //
+
+ - The "Loot Crate" Update
+
+[Fixed] Dynamic Crate Loot
+	
+[Changed] Addons Loader to Compile
+
+[Added] Higher Visibilty Crate
+	- The crate is now larger and "Safety" Orange
+[Added] Mission Wait Timeout
+	- Mission will now timeout if no one gets near within 15min
+	
+In support of freedom of speech, Je Suis Charlie, however: Si vis pacem, para bellum.
+France should not put anyone above the capability of self defence of individuals.
+http://www.thebangswitch.com/je-suis-desarme/
+
+// ===================================================== //
+
+Thanks to:
+Richie (UKGZ) - Development Server Provider
+Epoch Mod Team for Arma 3: Epoch Development
+
+Patreon Supporters:
+	Thanks for the "Amazing" support! It really
+motivates me to keep up the work!
+
+Patrons (In No Particular Order):
+ - The_Eye
+ - Vendaar
+ - Psych3UK
+ - GaspArt
+ - Derek
+ - Drav3n
+ - FogHorn
+ - dennis_stk
+ - Sascha L.
+ - Yip
+ - RC_Robio
+ - Robert
+ - Dan W.
+ - Bert W.
+ - theirongiant
+ - Fr1nk
+ - Glenn F.
+ - Chris C.
+
+// ===================================================== //
