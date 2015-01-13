@@ -495,19 +495,18 @@ VEMFRemoveDups = {
 };
 
 // Waits for players to be within the radius of the position
-// Will loop indefinitely until true
 VEMFNearWait = {
-	private ["_pos","_rad"];
+	private ["_pos","_rad","_time"];
 	
 	_pos = _this select 0;
 	_rad = _this select 1;
+	_time = diag_tickTime;
 	
 	while {true} do {
-		if ((count(_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], _rad])) > 0) exitWith {};
+		if ((count(_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], _rad])) > 0) exitWith {true};
+		if ((diag_tickTime - _time) > 900) exitWith {false};
 		uiSleep 5;
 	};
-	
-	true
 };
 
 // Waits for the Mission to be Completed
