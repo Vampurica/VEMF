@@ -1,7 +1,7 @@
 /*
 	Dynamic Town Invasion Mission by Vampire
 */
-private ["_canTown","_nearPlyr","_grpCnt","_housePos","_sqdPos","_msg","_alert","_winMsg","_crate"];
+private ["_canTown","_nearPlyr","_grpCnt","_housePos","_sqdPos","_msg","_alert","_winMsg","_crate","_wait"];
 
 if (!isNil "VEMFTownInvaded") exitWith {
 	// Town Already Under Occupation
@@ -53,7 +53,12 @@ if (!_alert) exitWith {
 };
 
 // Usage: COORDS, Radius
-[(_canTown select 1),1000] call VEMFNearWait;
+_wait = [(_canTown select 1),1000] call VEMFNearWait;
+
+if (!_wait) exitWith {
+	diag_log text format ["[VEMF]: DynTownInv: Mission Ended for Timeout."];
+	VEMFTownInvaded = nil;
+};
 
 // Player is Near, so Spawn the Units
 [(_canTown select 1),_sqdPos,false,1,"VEMFDynInv"] ExecVM VEMFSpawnAI;
@@ -70,16 +75,13 @@ if (!(isNil "VEMFDynInvKiller")) then {
 	(owner (vehicle VEMFDynInvKiller)) publicVariableClient "VEMFChatMsg";
 	VEMFDynKiller = nil;
 	
-	_crate = createVehicle ["Land_PaperBox_C_EPOCH",(_canTown select 1),[],0,"CAN_COLLIDE"];
+	_crate = createVehicle ["Box_IND_AmmoVeh_F",(_canTown select 1),[],0,"CAN_COLLIDE"];
+	_crate setObjectTextureGlobal [0, "#(argb,8,8,3)color(0,0,0,0.8)"];
+	_crate setObjectTextureGlobal [1, "#(argb,8,8,3)color(0.82,0.42,0.02,0.3)"];
 	_crate setVariable ["VEMFScenery", true];
 	[_crate] call VEMFLoadLoot;
 	diag_log text format ["[VEMF]: DynTownInv: Crate Spawned At: %1 / Grid: %2", (getPosATL _crate), mapGridPosition (getPosATL _crate)];
 };
 
-// Clean Up Remaining AI
-if (count VEMFDynInv > 0) then {
-	{ deleteVehicle _x } forEach VEMFDynInv;
-	VEMFDynInv = nil;
-};
-
+VEMFDynInv = nil;
 VEMFTownInvaded = nil;

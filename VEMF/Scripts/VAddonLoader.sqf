@@ -18,7 +18,7 @@ diag_log text format ["[VEMF]: Loading Any Addons."];
 {
 	if (_x != "") then {
 		// Let's run the addon
-		[] execVM format ["\VEMF\Addons\%1", _x];
+		call compile preprocessFileLineNumbers format ["\VEMF\Addons\%1", _x];
 	};
 } forEach VEMFAddon;
 

@@ -372,7 +372,7 @@ VEMFLoadAIGear = {
 };
 
 VEMFLoadLoot = {
-	private ["_crate","_var","_tmp"];
+	private ["_crate","_var","_tmp","_kindOf","_report","_cAmmo"];
 	
 	_crate = _this select 0;
 	
@@ -385,7 +385,7 @@ VEMFLoadLoot = {
 	clearBackpackCargoGlobal  _crate;
 	clearItemCargoGlobal _crate;
 	
-	if (isNil "VEMFLootList") then {
+	if (VEMFDynCrate) then {
 		VEMFLootList = [];
 		
 		// Generate Loot
@@ -394,30 +394,51 @@ VEMFLoadLoot = {
 			for "_z" from 0 to ((count(_tmp))-1) do {
 				VEMFLootList = VEMFLootList + [((_tmp select _z) select 0)];
 			};
-		} forEach ("getText(_x >> 'itemType') != 'weapon'" configClasses (configFile >> "CfgLootTable"));
+		} forEach ("configName _x != 'Uniforms' && configName _x != 'Headgear'" configClasses (configFile >> "CfgLootTable"));
 		
 		if (VEMFDebugFunc) then {
 			diag_log text format ["[VEMF]: LoadLootArray: %1", str(VEMFLootList)];
 		};
 	};
 	
-	VEMFLootList = [VEMFLootList] call VEMFRemoveDups;
-	
+	_report = [];
 	// Load Random Loot Amount
-	for "_i" from 1 to ((floor(random 4)) + 1) do {
+	for "_i" from 1 to ((floor(random 10)) + 10) do {
 		_var = (VEMFLootList call BIS_fnc_selectRandom);
 		
 		if (!(_var in VEMFCrateBlacklist)) then {
 			switch (true) do
 			{
-				case (isClass (configFile >> "cfgWeapons" >> _var)): {
-					if (!(_var in (itemCargo _crate))) then {
-						_crate addItemCargoGlobal [_var,(floor(random(3)))+1]; };
+				case (isClass (configFile >> "CfgWeapons" >> _var)): {
+					_kindOf = [(configFile >> "CfgWeapons" >> _var),true] call BIS_fnc_returnParents;
+					if ("ItemCore" in _kindOf) then {
+						_crate addItemCargoGlobal [_var,1];
+					} else {
+						_crate addWeaponCargoGlobal [_var,1];
+						
+						_cAmmo = [] + getArray (configFile >> "cfgWeapons" >> _var >> "magazines");
+						{
+							if (isClass(configFile >> "CfgPricing" >> _x)) exitWith {
+								_crate addMagazineCargoGlobal [_x,2];
+							};
+						} forEach _cAmmo;
 					};
-				case (isClass (configFile >> "cfgMagazines" >> _var)): { _crate addMagazineCargoGlobal [_var,(floor(random(3)))+1]; };
-				case ((getText(configFile >> "cfgVehicles" >> _var >>  "vehicleClass")) == "Backpacks"): { _crate addBackpackCargoGlobal [_var,1]; };
+				};
+				case (isClass (configFile >> "cfgMagazines" >> _var)): {
+					_crate addMagazineCargoGlobal [_var,1];
+				};
+				case ((getText(configFile >> "cfgVehicles" >> _var >>  "vehicleClass")) == "Backpacks"): {
+					_crate addBackpackCargoGlobal [_var,1];
+				};
+				default {
+					_report = _report + [_var];
+				};
 			};
 		};
+	};
+	
+	if ((count _report) > 0) then {
+		diag_log text format ["[VEMF]: LoadLoot: <Unknown> %1", str _report];
 	};
 	
 	if (VEMFDebugFunc) then {
@@ -480,6 +501,7 @@ VEMFBroadcast = {
 	_sent
 };
 
+// Removes Duplicate Array Entries (Doesn't Save Order)
 VEMFRemoveDups = {
 	private ["_array","_tmpArr"];
 	
@@ -495,19 +517,18 @@ VEMFRemoveDups = {
 };
 
 // Waits for players to be within the radius of the position
-// Will loop indefinitely until true
 VEMFNearWait = {
-	private ["_pos","_rad"];
+	private ["_pos","_rad","_time"];
 	
 	_pos = _this select 0;
 	_rad = _this select 1;
+	_time = diag_tickTime;
 	
 	while {true} do {
-		if ((count(_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], _rad])) > 0) exitWith {};
+		if ((count(_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], _rad])) > 0) exitWith {true};
+		if ((diag_tickTime - _time) > 900) exitWith {false};
 		uiSleep 5;
 	};
-	
-	true
 };
 
 // Waits for the Mission to be Completed
