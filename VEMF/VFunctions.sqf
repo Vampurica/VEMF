@@ -526,7 +526,7 @@ VEMFNearWait = {
 	
 	while {true} do {
 		if ((count(_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], _rad])) > 0) exitWith {true};
-		if ((diag_tickTime - _time) > 900) exitWith {false};
+		if (VEMFTimeout && {(diag_tickTime - _time) > (VEMFTimeoutTime * 60)}) exitWith {false};
 		uiSleep 5;
 	};
 };

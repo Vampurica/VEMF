@@ -44,6 +44,14 @@ VEMFCrateBlacklist = [
 VEMFMinMissTime = 5;
 VEMFMaxMissTime = 20;
 
+// Timeout (No Players Near)
+// Time in minutes
+VEMFTimeoutTime = 20;
+
+// Enable Timeout?
+// In false waits forever
+VEMFTimeout = true;
+
 // Mission Name Array
 VEMFMissionArray = ["DynamicTownInvasion"];
 
