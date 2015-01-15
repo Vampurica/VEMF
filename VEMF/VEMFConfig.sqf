@@ -52,6 +52,10 @@ VEMFTimeoutTime = 20;
 // In false waits forever
 VEMFTimeout = true;
 
+// Announce to Last Killer or to Near Players?
+// Distance in Meters. 0 for Last Killer option.
+VEMFMissEndAnn = 0;
+
 // Mission Name Array
 VEMFMissionArray = ["DynamicTownInvasion"];
 

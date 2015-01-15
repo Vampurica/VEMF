@@ -74,7 +74,15 @@ if (!(isNil "VEMFDynInvKiller")) then {
 	_winMsg = format ["%1 Liberated!", (_canTown select 0)];
 	_winMsg = [_winMsg,"Locals have left Supplies in town for the Liberators."];
 	VEMFChatMsg = _winMsg;
-	(owner (vehicle VEMFDynInvKiller)) publicVariableClient "VEMFChatMsg";
+	if (VEMFMissEndAnn > 0) then {
+		{
+			if ((isPlayer _x) && {((_x distance (_canTown select 1)) <= VEMFMissEndAnn)}) then {
+				(owner (vehicle _x)) publicVariableClient "VEMFChatMsg";
+			};
+		} forEach playableUnits;
+	} else {
+		(owner (vehicle VEMFDynInvKiller)) publicVariableClient "VEMFChatMsg";
+	};
 	VEMFDynKiller = nil;
 	
 	_crate = createVehicle ["Box_IND_AmmoVeh_F",(_canTown select 1),[],0,"CAN_COLLIDE"];
