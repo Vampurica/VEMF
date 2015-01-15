@@ -453,10 +453,6 @@ VEMFBroadcast = {
 	_eRads = ["EpochRadio0","EpochRadio1","EpochRadio2","EpochRadio3","EpochRadio4","EpochRadio5","EpochRadio6","EpochRadio7","EpochRadio8","EpochRadio9"];
 	_eRads = _eRads call BIS_fnc_arrayShuffle;
 	
-	if (typeName _msg != "STRING") then {
-		_msg = str _msg;
-	};
-	
 	// Broadcast to Each Player
 	_sent = false;
 	_allUnits = allUnits;

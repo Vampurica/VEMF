@@ -14,7 +14,7 @@ diag_log text format ["[VEMF]: Running Dynamic Town Invasion Mission."];
 // Find A Town to Invade
 while {true} do {
 	_canTown = call VEMFFindTown;
-	_nearPlyr = {isPlayer _x} count ((_canTown select 1) nearEntities[["Epoch_Male_F", "Epoch_Female_F"], 800]) > 0;
+	_nearPlyr = {isPlayer _x} count ((_canTown select 1) nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) > 0;
 	
 	if (!_nearPlyr) exitWith {
 		// No Players Near Else Loop Again
@@ -43,7 +43,8 @@ _sqdPos = [];
 
 
 // Now we have Unit Positions, We Announce the Mission and Wait
-_msg = format ["We have spotted hostile fireteams in %1! We'll give you some supplies if you can liberate the town.", (_canTown select 0)];
+_msg = format ["Hostile Fireteams seen in %1", (_canTown select 0)];
+_msg = [_msg,"Locals Promise Supplies for any Armed Aid."];
 _alert = [_msg] call VEMFBroadcast;
 
 if (!_alert) exitWith {
@@ -70,7 +71,8 @@ waitUntil{!isNil "VEMFDynInv"};
 
 // Rewards
 if (!(isNil "VEMFDynInvKiller")) then {
-	_winMsg = format ["%1 has been cleared! You can find your reward at the town center.", (_canTown select 0)];
+	_winMsg = format ["%1 Liberated!", (_canTown select 0)];
+	_winMsg = [_winMsg,"Locals have left Supplies in town for the Liberators."];
 	VEMFChatMsg = _winMsg;
 	(owner (vehicle VEMFDynInvKiller)) publicVariableClient "VEMFChatMsg";
 	VEMFDynKiller = nil;
