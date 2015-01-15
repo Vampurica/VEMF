@@ -1,0 +1,40 @@
+// ===================================================== //
+// ================= v1.0.0c Pre-Alpha ================= //
+
+ - The "Final Adjustments" Update (Hopefully Full Alpha Comes Next!)
+
+[Fixed] Crate Placement
+	- Crates Now Spawn in the Open (Instead on Inside/On Objects)
+
+
+
+// ===================================================== //
+
+Thanks to:
+Richie & Winston (UKGZ) - Development Server Provider
+Epoch Mod Team for Arma 3: Epoch Development
+
+Patreon Supporters:
+	Thanks for the "Awesome" support!
+	With support like this, VEMF can only get better!
+
+Patrons (In No Particular Order):
+ - The_Eye
+ - Vendaar
+ - Psych3UK
+ - GaspArt
+ - Derek
+ - FogHorn
+ - dennis_stk
+ - Sascha L.
+ - Yip
+ - RC_Robio
+ - Robert
+ - Dan W.
+ - Bert W.
+ - theirongiant
+ - Fr1nk
+ - Glenn F.
+ - Chris C.
+
+// ===================================================== //
