@@ -5,8 +5,11 @@
 
 [Fixed] Crate Placement
 	- Crates Now Spawn in the Open (Instead on Inside/On Objects)
-
-
+	
+[Added] New Mission Announcement Method
+	- No Longer using systemChat
+[Added] Config to Announce Mission Cleared
+	- Either send to last AI Killer or to people in range
 
 // ===================================================== //
 
