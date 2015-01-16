@@ -326,6 +326,12 @@ VEMFLoadAIGear = {
 		
 		// Add Backpack (Future?)
 		
+		// Add Food/Drink
+		// 33% Chance
+		if ((floor(random(2))) == 1) then {
+			_unit addMagazine ((getArray (configFile >> "CfgLootTable" >> "Food" >> "items")) call BIS_fnc_selectRandom);
+		};
+		
 		// Add Weapons & Ammo
 		_prim = VEMFRiflesList call BIS_fnc_selectRandom;
 		_seco = VEMFPistolsList call BIS_fnc_selectRandom;
@@ -357,8 +363,14 @@ VEMFLoadAIGear = {
 		_unit addWeapon _seco;
 		
 		// Add Grenades for GL Units
-		if (_prim in ["arifle_Katiba_GL_F","arifle_MX_GL_F","arifle_TRG21_GL_F","arifle_Mk20_GL_F","arifle_Mk20_GL_plain_F","arifle_MX_GL_Black_F"]) then {
+		if ((count(getArray (configFile >> "cfgWeapons" >> _prim >> "muzzles"))) > 1) then {
 			_unit addMagazine "1Rnd_HE_Grenade_shell";
+		};
+		
+		// 20% Chance Hand Grenade
+		// Random Returns 0,1,2,3,4
+		if ((floor(random(5))) == 2) then {
+			_unit addMagazine "HandGrenade";
 		};
 		
 		if (VEMFDebugFunc) then {
