@@ -53,7 +53,7 @@ if (_mConfig != '') then {
 diag_log text format ["[VEMF]: Currently Running Version: %1", VEMFVersion];
 
 // Version Check
-if (VEMFVersion != "1.0.0b-PreAlpha") then {
+if (VEMFVersion != "1.0.0c-PreAlpha") then {
 	diag_log text format ["[VEMF]: Outdated Configuration Detected! Please Update."];
 };
 
