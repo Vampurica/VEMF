@@ -89,7 +89,7 @@ if (!(isNil "VEMFDynInvKiller")) then {
 	_crate setObjectTextureGlobal [0, "#(argb,8,8,3)color(0,0,0,0.8)"];
 	_crate setObjectTextureGlobal [1, "#(argb,8,8,3)color(0.82,0.42,0.02,0.3)"];
 	_crate setVariable ["VEMFScenery", true];
-	_crate setPos ((_canTown select 1) findEmptyPosition [0,25,(typeOf _crate)]);
+	_crate setPos ((_canTown select 1) findEmptyPosition [0,30,(typeOf _crate)]);
 	[_crate] call VEMFLoadLoot;
 	diag_log text format ["[VEMF]: DynTownInv: Crate Spawned At: %1 / Grid: %2", (getPosATL _crate), mapGridPosition (getPosATL _crate)];
 };
