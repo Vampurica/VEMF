@@ -1,4 +1,4 @@
-if (isClient) then {
+if (!isDedicated) then {
 	"VEMFChatMsg" addPublicVariableEventHandler {
 		[
 			[
