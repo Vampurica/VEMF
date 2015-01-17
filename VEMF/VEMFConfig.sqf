@@ -16,6 +16,10 @@ VEMFDebugLocs = false;
 VEMFDebugAI = false;
 VEMFDebugFunc = false;
 
+// AI Group Count per City
+// Default is 3 Groups
+VEMFGroupCnt = 3;
+
 // Punish Players who Run Over AI?
 // Causes 10% Vehicle Damage per AI Runover
 VEMFPunishRunover = true;

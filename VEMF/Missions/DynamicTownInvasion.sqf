@@ -24,7 +24,7 @@ while {true} do {
 };
 
 // Group Count
-_grpCnt = 3;
+_grpCnt = VEMFGroupCnt;
 
 // We Found a Town with No Players. Let's Invade.
 // Format: [POS, HouseCount]
