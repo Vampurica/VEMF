@@ -296,7 +296,7 @@ VEMFSetupVic = {
 
 // Loads a New AI Full of Gear
 VEMFLoadAIGear = {
-	private ["_unit","_fin","_prim","_seco","_pAmmo","_hAmmo"];
+	private ["_unit","_fin","_prim","_seco","_pAmmo","_hAmmo","_attachment"];
 	
 	_unit = _this select 0;
 	_fin = false;
@@ -371,6 +371,12 @@ VEMFLoadAIGear = {
 		// Random Returns 0,1,2,3,4
 		if ((floor(random(5))) == 2) then {
 			_unit addMagazine "HandGrenade";
+		};
+		
+		// 10% Scope Attachment Chance
+		if ((floor(random(10))) == 5) then {
+			_attachment = (getArray (configFile >> "cfgLootTable" >> "Scopes" >> "items")) call BIS_fnc_selectRandom;
+			_unit addPrimaryWeaponItem _attachment;
 		};
 		
 		if (VEMFDebugFunc) then {
