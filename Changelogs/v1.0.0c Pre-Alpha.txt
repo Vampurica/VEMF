@@ -10,6 +10,7 @@
 	- No Longer using systemChat
 [Added] Config to Announce Mission Cleared
 	- Either send to last AI Killer or to people in range
+[Added] AI Have Chance to spawn with Grenades, Food, and Optics
 
 // ===================================================== //
 
