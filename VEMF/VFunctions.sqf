@@ -376,7 +376,7 @@ VEMFLoadAIGear = {
 		// 10% Scope Attachment Chance
 		if ((floor(random(10))) == 5) then {
 			_attachment = (getArray (configFile >> "cfgLootTable" >> "Scopes" >> "items")) call BIS_fnc_selectRandom;
-			_unit addPrimaryWeaponItem _attachment;
+			_unit addPrimaryWeaponItem (_attachment select 0);
 		};
 		
 		if (VEMFDebugFunc) then {
