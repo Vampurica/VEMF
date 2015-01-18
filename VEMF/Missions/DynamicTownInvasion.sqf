@@ -1,7 +1,7 @@
 /*
 	Dynamic Town Invasion Mission by Vampire
 */
-private ["_canTown","_nearPlyr","_grpCnt","_housePos","_sqdPos","_msg","_alert","_winMsg","_crate","_wait"];
+private ["_canTown","_nearPlyr","_grpCnt","_housePos","_sqdPos","_msg","_alert","_winMsg","_crate","_cratePos","_wait"];
 
 if (!isNil "VEMFTownInvaded") exitWith {
 	// Town Already Under Occupation
@@ -70,29 +70,32 @@ waitUntil{!isNil "VEMFDynInv"};
 [(_canTown select 1),"VEMFDynInv"] call VEMFWaitMissComp;
 
 // Rewards
-if (!(isNil "VEMFDynInvKiller")) then {
-	_winMsg = format ["%1 Liberated!", (_canTown select 0)];
-	_winMsg = [_winMsg,"Locals have left Supplies in town for the Liberators."];
-	VEMFChatMsg = _winMsg;
-	if (VEMFMissEndAnn > 0) then {
-		{
-			if ((isPlayer _x) && {((_x distance (_canTown select 1)) <= VEMFMissEndAnn)}) then {
-				(owner (vehicle _x)) publicVariableClient "VEMFChatMsg";
-			};
-		} forEach playableUnits;
-	} else {
+_winMsg = format ["%1 Liberated!", (_canTown select 0)];
+_winMsg = [_winMsg,"Locals have left Supplies in town for the Liberators."];
+VEMFChatMsg = _winMsg;
+if (VEMFMissEndAnn > 0) then {
+	{
+		if ((isPlayer _x) && {((_x distance (_canTown select 1)) <= VEMFMissEndAnn)}) then {
+			(owner (vehicle _x)) publicVariableClient "VEMFChatMsg";
+		};
+	} forEach playableUnits;
+} else {
+	if (!(isNil "VEMFDynInvKiller")) then {
 		(owner (vehicle VEMFDynInvKiller)) publicVariableClient "VEMFChatMsg";
 	};
-	VEMFDynKiller = nil;
-	
-	_crate = createVehicle ["Box_IND_AmmoVeh_F",(_canTown select 1),[],0,"CAN_COLLIDE"];
-	_crate setObjectTextureGlobal [0, "#(argb,8,8,3)color(0,0,0,0.8)"];
-	_crate setObjectTextureGlobal [1, "#(argb,8,8,3)color(0.82,0.42,0.02,0.3)"];
-	_crate setVariable ["VEMFScenery", true];
-	_crate setPos ((_canTown select 1) findEmptyPosition [0,30,(typeOf _crate)]);
-	[_crate] call VEMFLoadLoot;
-	diag_log text format ["[VEMF]: DynTownInv: Crate Spawned At: %1 / Grid: %2", (getPosATL _crate), mapGridPosition (getPosATL _crate)];
 };
+VEMFDynKiller = nil;
+	
+_crate = createVehicle ["Box_IND_AmmoVeh_F",(_canTown select 1),[],0,"CAN_COLLIDE"];
+_crate setObjectTextureGlobal [0, "#(argb,8,8,3)color(0,0,0,0.8)"];
+_crate setObjectTextureGlobal [1, "#(argb,8,8,3)color(0.82,0.42,0.02,0.3)"];
+_crate setVariable ["VEMFScenery", true];
+_cratePos = (_canTown select 1) findEmptyPosition [0,50,(typeOf _crate)];
+if ((count _cratePos) > 0) then {
+	_crate setPos _cratePos;
+};
+[_crate] call VEMFLoadLoot;
+diag_log text format ["[VEMF]: DynTownInv: Crate Spawned At: %1 / Grid: %2", (getPosATL _crate), mapGridPosition (getPosATL _crate)];
 
 VEMFDynInv = nil;
 VEMFTownInvaded = nil;
