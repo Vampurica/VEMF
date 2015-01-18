@@ -1,5 +1,6 @@
 if (!isDedicated) then {
 	"VEMFChatMsg" addPublicVariableEventHandler {
+		systemChat ((_this select 1) select 0);
 		[
 			[
 				[((_this select 1) select 0),"align = 'center' size = '1' font='PuristaBold'"],
