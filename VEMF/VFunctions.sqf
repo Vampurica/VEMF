@@ -329,7 +329,7 @@ VEMFLoadAIGear = {
 		// Add Food/Drink
 		// 33% Chance
 		if ((floor(random(2))) == 1) then {
-			_unit addMagazine ((getArray (configFile >> "CfgLootTable" >> "Food" >> "items")) call BIS_fnc_selectRandom);
+			_unit addMagazine (((getArray (configFile >> "CfgLootTable" >> "Food" >> "items")) call BIS_fnc_selectRandom) select 0);
 		};
 		
 		// Add Weapons & Ammo
