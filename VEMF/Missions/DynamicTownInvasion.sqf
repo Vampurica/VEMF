@@ -86,9 +86,7 @@ if (VEMFMissEndAnn > 0) then {
 };
 VEMFDynKiller = nil;
 	
-_crate = createVehicle ["Box_IND_AmmoVeh_F",(_canTown select 1),[],0,"CAN_COLLIDE"];
-_crate setObjectTextureGlobal [0, "#(argb,8,8,3)color(0,0,0,0.8)"];
-_crate setObjectTextureGlobal [1, "#(argb,8,8,3)color(0.82,0.42,0.02,0.3)"];
+_crate = createVehicle ["CargoNet_01_box_F",(_canTown select 1),[],0,"CAN_COLLIDE"];
 _crate setVariable ["VEMFScenery", true];
 _cratePos = (_canTown select 1) findEmptyPosition [0,50,(typeOf _crate)];
 if ((count _cratePos) > 0) then {
