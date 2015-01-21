@@ -329,7 +329,7 @@ VEMFLoadAIGear = {
 		// Add Food/Drink
 		// 33% Chance
 		if ((floor(random(2))) == 1) then {
-			_unit addMagazine ((getArray (configFile >> "CfgLootTable" >> "Food" >> "items")) call BIS_fnc_selectRandom);
+			_unit addMagazine (((getArray (configFile >> "CfgLootTable" >> "Food" >> "items")) call BIS_fnc_selectRandom) select 0);
 		};
 		
 		// Add Weapons & Ammo
@@ -376,7 +376,7 @@ VEMFLoadAIGear = {
 		// 10% Scope Attachment Chance
 		if ((floor(random(10))) == 5) then {
 			_attachment = (getArray (configFile >> "cfgLootTable" >> "Scopes" >> "items")) call BIS_fnc_selectRandom;
-			_unit addPrimaryWeaponItem _attachment;
+			_unit addPrimaryWeaponItem (_attachment select 0);
 		};
 		
 		if (VEMFDebugFunc) then {
