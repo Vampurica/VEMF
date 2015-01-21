@@ -49,13 +49,8 @@ if (_SorR) then
 {
 	// Strict Distribution
 
-	if (count _posArr > 1) then {
+	if (!(typeName (_posArr select 0) == "SCALAR")) then {
 		// We have multiple positions. Spawn a group at each one.
-		
-		// Check for Nested Array
-		if (typeName (_posArr select 0) == "SCALAR") exitWith {
-			diag_log text format ["[VEMF]: Warning: AI Spawn: Strict Distribution Not a Nested Array!"];
-		};
 		
 		// Find the Owner
 		//_owner = owner (((_posArr select 0) nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) select 0);
@@ -68,8 +63,8 @@ if (_SorR) then
 		{
 			for "_i" from 1 to (_grpCount*_unitsPerGrp) do
 			{
-				// Find Nearby Position (Radius 25m)
-				_newPos = [_x,0,25,60,0,20,0] call BIS_fnc_findSafePos;
+				// Find Nearby Position (Radius 30m)
+				_newPos = _x findEmptyPosition [0,30,"I_Soldier_EPOCH"];
 				
 				if (count (units _grp) == _unitsPerGrp) then {
 					// Fireteam is Full, Create a New Group
@@ -134,8 +129,8 @@ if (_SorR) then
 		// Spawn Groups near Position
 		for "_i" from 1 to (_grpCount*_unitsPerGrp) do
 		{
-			// Find Nearby Position (Radius 25m)
-			_newPos = [_pos,0,25,60,0,20,0] call BIS_fnc_findSafePos;
+			// Find Nearby Position (Radius 30m)
+			_newPos = _x findEmptyPosition [0,30,"I_Soldier_EPOCH"];
 			
 			if (count (units _grp) == _unitsPerGrp) then {
 				// Fireteam is Full, Create a New Group
