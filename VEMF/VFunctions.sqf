@@ -178,6 +178,9 @@ VEMFHousePositions = {
 		if (str(_x buildingPos 0) == "[0,0,0]") then {
 			_houseArr = _houseArr - [_x];
 		};
+		if ((typeOf _x) in ["Land_Panelak","Land_Panelak2"]) then {
+			_houseArr = _houseArr - [_x];
+		};
 	} forEach _houseArr;
 	
 	// Randomize Valid Houses
