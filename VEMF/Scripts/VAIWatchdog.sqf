@@ -10,7 +10,7 @@ diag_log text format ["[VEMF]: AI Watchdog Running."];
 [] spawn {
 	private ["_cache","_cGrp","_pos"];
 	
-	if (isNil "_cache") then { _cache = []; };
+	_cache = [];
 	if (isNil "VEMFForceCache") then { VEMFForceCache = []; };
 	
 	// Force Caching Chunk
@@ -33,7 +33,7 @@ diag_log text format ["[VEMF]: AI Watchdog Running."];
 	// No Nearby Players Caching Chunk
 	{
 		if (_x getVariable ["VEMFAI", false]) then {
-			if !(count ((getposATL leader group _x) nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 1000]) > 0) then {
+			if !(count ((getposATL leader group _x) nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 1000]) > 0) then { //this nearEntities Check doesn't get the player if they are in a vehicle
 				// We need to Cache the Group
 				_cGrp = (group _x);
 			
