@@ -16,9 +16,6 @@ if (!isServer) exitWith {
 	// If you remove this IF, may god help you with the errors
 };
 
-// Add Damage Fix until Epoch Fixes it
-[] ExecVM "\VEMF\Scripts\VAllowDamage.sqf";
-
 // Let's let any heavier scripts run first
 sleep 60;
 
