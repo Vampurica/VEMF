@@ -1,7 +1,7 @@
 /*
 	Dynamic Town Invasion Mission by Vampire
 */
-private ["_canTown","_nearPlyr","_grpCnt","_housePos","_sqdPos","_msg","_alert","_winMsg","_crate","_cratePos","_wait"];
+private ["_canTown","_grpCnt","_housePos","_sqdPos","_msg","_alert","_winMsg","_crate","_cratePos","_wait"];
 
 if (!isNil "VEMFTownInvaded") exitWith {
 	// Town Already Under Occupation
