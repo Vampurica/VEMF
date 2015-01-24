@@ -140,20 +140,27 @@ VEMFRandomPos = {
 
 // Finds a Random Town on the Map
 VEMFFindTown = {
-	private ["_cntr","_townArr","_sRandomTown","_townPos","_townName","_ret"];
+	private ["_cntr","_townArr","_sRandomTown","_townPos","_townName","_nearP","_ret"];
 	
 	_cntr = (epoch_centerMarkerPosition);
 
 	// Get a list of towns
-	// Shouldn't cause lag because of the infrequency it runs (Needs Testing)
 	_townArr = nearestLocations [_cntr, ["NameCity","NameCityCapital"], 30000];
 	
-	// Pick a random town
-	_sRandomTown = _townArr call BIS_fnc_selectRandom;
-	
-	// Return Name and POS
-	_townPos = [((locationPosition _sRandomTown) select 0), ((locationPosition _sRandomTown) select 1), 0];
-	_townName = (text _sRandomTown);
+	while {true} do {
+		// Pick a random town
+		_sRandomTown = _townArr call BIS_fnc_selectRandom;
+		
+		// Return Name and POS
+		_townPos = [((locationPosition _sRandomTown) select 0), ((locationPosition _sRandomTown) select 1), 0];
+		_townName = (text _sRandomTown);
+		
+		// Check Town or Loop
+		_nearP = {isPlayer _x} count (_townPos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) > 0;
+		if (!_nearP) exitWith {};
+		
+		uiSleep 30;
+	};
 
 	_ret = [_townName, _townPos];
 	_ret
@@ -220,20 +227,17 @@ VEMFHousePositions = {
 	_fin
 };
 
-// Temporary Vehicle Setup
-// Assume to NOT Work at This Time
-// Server "May" Have an AutoSave Loop
-/* Disabled Until Later Version
+// Vehicle Setup
 VEMFSetupVic = {
-	private ["_vehicle","_vClass","_ranFuel","_config","_textureSelectionIndex","_selections","_colors","_textures","_color","_count"];
+	private ["_vehicle","_ranFuel","_config","_textureSelectionIndex","_selections","_colors","_textures","_color","_count"];
+	
 	_vehicle = _this select 0;
-	_vClass = (typeOf _vehicle);
 	
 	waitUntil {(!isNull _vehicle)};
 	
-	// Set Vehicle Token
-	// Will Delete if Not Set
-	_vehicle call EPOCH_server_setVToken;
+	// Set Variables
+	_vehicle setVariable ["LASTLOGOUT_EPOCH", (diag_tickTime + 604800)];
+	_vehicle setVariable ["LAST_CHECK", (diag_tickTime + 604800)];
 	
 	// Add to A3 Cleanup
 	addToRemainsCollector [_vehicle];
@@ -247,16 +251,20 @@ VEMFSetupVic = {
 	clearBackpackCargoGlobal  _vehicle;
 	clearItemCargoGlobal _vehicle;
 	
-	// Set the Vehicle Lock Time (0 Seconds)
-	// Vehicle Will Spawn Unlocked
-	_vehicle lock true;
-	_vehicle setVariable["LOCK_OWNER", "-1"];
-	_vehicle setVariable["LOCKED_TILL", serverTime];
+	// Set Vehicle Slot
+	EPOCH_VehicleSlotsLimit = EPOCH_VehicleSlotsLimit + 1;
+	EPOCH_VehicleSlots pushBack (str EPOCH_VehicleSlotsLimit);
+	_vehicle setVariable ["VEHICLE_SLOT",(EPOCH_VehicleSlots select 0),true];
+	EPOCH_VehicleSlots = EPOCH_VehicleSlots - [(EPOCH_VehicleSlots select 0)];
+	EPOCH_VehicleSlotCount = count EPOCH_VehicleSlots;
+	
+	// Set vToken
+	_vehicle call EPOCH_server_setVToken;
 	
 	// Pick a Random Color if Available
-	_config = configFile >> "CfgVehicles" >> _vClass >> "availableColors";
+	_config = configFile >> "CfgVehicles" >> (typeOf _vehicle) >> "availableColors";
 	if (isArray(_config)) then {
-		_textureSelectionIndex = configFile >> "CfgVehicles" >> _vClass >> "textureSelectionIndex";
+		_textureSelectionIndex = configFile >> "CfgVehicles" >> (typeOf _vehicle) >> "textureSelectionIndex";
 		_selections = if (isArray(_textureSelectionIndex)) then {
 			getArray(_textureSelectionIndex)
 		} else {
@@ -279,23 +287,48 @@ VEMFSetupVic = {
 	
 	// Set Vehicle Init
 	_vehicle call EPOCH_server_vehicleInit;
-	
-	// Set a Random Fuel Amount
-	_ranFuel = random 1;
-	if (_ranFuel < 0.1) then {_ranFuel = 0.1;};
-	_vehicle setFuel _ranFuel;
-	_vehicle setVelocity [0,0,1];
-	_vehicle setDir (round(random 360));
-	
-	// If the Vehicle is Temporary, Warn Players
-	if (!(VEMFSaveVehicles)) then {
-		_vehicle addEventHandler ["GetIn",{
-			_nil = ["Warning: Vehicle Will Disappear on Restart!","systemChat",(_this select 2),false,true] call BIS_fnc_MP;
-		}];
-	};
 
 	true
-}; */
+};
+
+// Random Fuel
+VEMFRanFuel = {
+	private ["_vehicle"];
+	
+	_vehicle = _this select 0;
+	
+	if (local _vehicle) then {
+		_ranFuel = random 1;
+		if (_ranFuel < 0.1) then {_ranFuel = 0.1;};
+		_vehicle setFuel _ranFuel;
+		_vehicle setVelocity [0,0,1];
+		_vehicle setDir (round(random 360));
+		
+		true
+	} else {
+		false
+	};
+};
+
+// Levels an Object to the Terrain (Mostly)
+// Code from KK
+VEMFLevel = {
+	private ["_vic"];
+
+	_vic = _this select 0;
+	
+	if (local _vic) then {
+		_sn = surfaceNormal visiblePositionASL _vic;
+		_k = abs (_sn vectorDotProduct vectorDirVisual _vic);
+		_vic setVectorUp (
+			(_sn vectorMultiply _k) vectorAdd (
+				[0,0,1] vectorMultiply (
+					sqrt (1 - (_sn vectorDotProduct [0,0,1]) ^ 2) - _k
+				)
+			)
+		);
+	};
+};
 
 // Loads a New AI Full of Gear
 VEMFLoadAIGear = {
