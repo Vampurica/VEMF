@@ -50,134 +50,62 @@ if (_SorR) then
 	// Strict Distribution
 
 	if (!(typeName (_posArr select 0) == "SCALAR")) then {
-		// We have multiple positions. Spawn a group at each one.
-		
-		// Find the Owner
-		//_owner = owner (((_posArr select 0) nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) select 0);
-		
-		// Create the Group
-		_grp = createGroup RESISTANCE;
-		_grp setBehaviour "AWARE";
-		_grp setCombatMode "RED";
-		
-		{
-			for "_i" from 1 to (_grpCount*_unitsPerGrp) do
-			{
-				// Find Nearby Position (Radius 30m)
-				_newPos = _x findEmptyPosition [0,30,"I_Soldier_EPOCH"];
-				
-				if (count (units _grp) == _unitsPerGrp) then {
-					// Fireteam is Full, Create a New Group
-					_grpArr = _grpArr + [_grp];
-					_grp = grpNull;
-					_grp = createGroup RESISTANCE;
-					_grp setBehaviour "AWARE";
-					_grp setCombatMode "RED";
-				};
-				
-				// Create Unit There
-				_unit = _grp createUnit [_sldrClass, _newPos, [], 0, "FORM"];
-				
-				// Load the AI
-				[_unit] call VEMFLoadAIGear;
-				
-				// Enable its AI
-				_unit setSkill 0.6;
-				_unit setRank "Private";
-				_unit enableAI "TARGET";
-				_unit enableAI "AUTOTARGET";
-				_unit enableAI "MOVE";
-				_unit enableAI "ANIM";
-				// Might write a custom FSM in the future
-				// Default Arma 3 Soldier FSM for now
-				_unit enableAI "FSM";
-				
-				// Prepare for Cleanup or Caching
-				//_unit addEventHandler ["Local",{ [(_this select 0), (_this select 1)] ExecVM VEMFLocalHandler; }];
-				_unit addEventHandler ["Killed",{ [(_this select 0), (_this select 1)] ExecVM VEMFAIKilled; }];
-				_unit setVariable ["VEMFUArray", _arrName];
-				_unit setVariable ["VEMFAI", true];
-				_unit setVariable ["LASTLOGOUT_EPOCH", (diag_tickTime + 14400)];
-				
-				// Leader Assignment
-				if (count (units _grp) == _unitsPerGrp) then {
-					_unit setSkill 1;
-					_grp selectLeader _unit;
-				};
-				
-				// Set Owner to Prevent Server Local Cleanup
-				//_unit setOwner _owner;
-			};
-		} forEach _posArr;
+		_posArr = (_posArr select 0);
+	};
 
-		if (VEMFDebugAI) then {
-			diag_log text format ["[VEMF]: AI Debug: Spawned %1 Units at Grid %2", (_grpCount*_unitsPerGrp), (mapGridPosition _pos)];
-		};
-		
-	} else {
+	// Create the Group
+	_grp = createGroup RESISTANCE;
+	_grp setBehaviour "AWARE";
+	_grp setCombatMode "RED";
 	
-		// We have a single POS given.
+	// Spawn Groups near Position
+	for "_i" from 1 to (_grpCount*_unitsPerGrp) do
+	{
+		// Find Nearby Position (Radius 30m)
+		_newPos = _pos findEmptyPosition [0,30,"I_Soldier_EPOCH"];
 		
-		// Find the Owner
-		//_owner = owner ((_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) select 0);
+		if (count (units _grp) == _unitsPerGrp) then {
+			// Fireteam is Full, Create a New Group
+			_grpArr = _grpArr + [_grp];
+			_grp = grpNull;
+			_grp = createGroup RESISTANCE;
+			_grp setBehaviour "AWARE";
+			_grp setCombatMode "RED";
+		};
+		
+		// Create Unit There
+		_unit = _grp createUnit [_sldrClass, _newPos, [], 0, "FORM"];
+		
+		// Load the AI
+		[_unit] call VEMFLoadAIGear;
+		
+		// Enable its AI
+		_unit setSkill 0.6;
+		_unit setRank "Private";
+		_unit enableAI "TARGET";
+		_unit enableAI "AUTOTARGET";
+		_unit enableAI "MOVE";
+		_unit enableAI "ANIM";
+		// Might write a custom FSM in the future
+		// Default Arma 3 Soldier FSM for now
+		_unit enableAI "FSM";
+		
+		// Prepare for Cleanup or Caching
+		_unit addEventHandler ["Killed",{ [(_this select 0), (_this select 1)] ExecVM VEMFAIKilled; }];
+		_unit setVariable ["VEMFUArray", _arrName];
+		_unit setVariable ["VEMFAI", true];
+		_unit setVariable ["LASTLOGOUT_EPOCH", (diag_tickTime + 14400)];
+		
+		// Leader Assignment
+		if (count (units _grp) == _unitsPerGrp) then {
+			_unit setSkill 1;
+			_grp selectLeader _unit;
+		};
+		
+	};
 	
-		// Create the Group
-		_grp = createGroup RESISTANCE;
-		_grp setBehaviour "AWARE";
-		_grp setCombatMode "RED";
-		
-		// Spawn Groups near Position
-		for "_i" from 1 to (_grpCount*_unitsPerGrp) do
-		{
-			// Find Nearby Position (Radius 30m)
-			_newPos = _x findEmptyPosition [0,30,"I_Soldier_EPOCH"];
-			
-			if (count (units _grp) == _unitsPerGrp) then {
-				// Fireteam is Full, Create a New Group
-				_grpArr = _grpArr + [_grp];
-				_grp = grpNull;
-				_grp = createGroup RESISTANCE;
-				_grp setBehaviour "AWARE";
-				_grp setCombatMode "RED";
-			};
-			
-			// Create Unit There
-			_unit = _grp createUnit [_sldrClass, _newPos, [], 0, "FORM"];
-			
-			// Load the AI
-			[_unit] call VEMFLoadAIGear;
-			
-			// Enable its AI
-			_unit setSkill 0.6;
-			_unit setRank "Private";
-			_unit enableAI "TARGET";
-			_unit enableAI "AUTOTARGET";
-			_unit enableAI "MOVE";
-			_unit enableAI "ANIM";
-			// Might write a custom FSM in the future
-			// Default Arma 3 Soldier FSM for now
-			_unit enableAI "FSM";
-			
-			// Prepare for Cleanup or Caching
-			//_unit addEventHandler ["Local",{ [(_this select 0), (_this select 1)] ExecVM VEMFLocalHandler; }];
-			_unit addEventHandler ["Killed",{ [(_this select 0), (_this select 1)] ExecVM VEMFAIKilled; }];
-			_unit setVariable ["VEMFUArray", _arrName];
-			_unit setVariable ["VEMFAI", true];
-			_unit setVariable ["LASTLOGOUT_EPOCH", (diag_tickTime + 14400)];
-			
-			// Leader Assignment
-			if (count (units _grp) == _unitsPerGrp) then {
-				_unit setSkill 1;
-				_grp selectLeader _unit;
-			};
-			
-			// Set Owner to Prevent Server Local Cleanup
-			//_unit setOwner _owner;
-		};
-		
-		if (VEMFDebugAI) then {
-			diag_log text format ["[VEMF]: AI Debug: Spawned %1 Units at Grid %2", (_grpCount*_unitsPerGrp), (mapGridPosition _pos)];
-		};
+	if (VEMFDebugAI) then {
+		diag_log text format ["[VEMF]: AI Debug: Spawned %1 Units at Grid %2", (_grpCount*_unitsPerGrp), (mapGridPosition _pos)];
 	};
 
 } else {
@@ -187,9 +115,6 @@ if (_SorR) then
 	if (typeName (_posArr select 0) == "SCALAR") exitWith {
 		diag_log text format ["[VEMF]: Warning: AI Spawn: Rough Distribution Requires Multiple Positions!"];
 	};
-	
-	// Find the Owner
-	//_owner = owner ((_pos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) select 0);
 	
 	// Create the Group
 	_grp = createGroup RESISTANCE;
@@ -215,7 +140,6 @@ if (_SorR) then
 		_unit enableAI "FSM";
 		
 		// Prepare for Cleanup or Caching
-		//_unit addEventHandler ["Local",{ [(_this select 0), (_this select 1)] ExecVM VEMFLocalHandler; }];
 		_unit addEventHandler ["Killed",{ [(_this select 0), (_this select 1)] ExecVM VEMFAIKilled; }];
 		_unit setVariable ["VEMFUArray", _arrName];
 		_unit setVariable ["VEMFAI", true];
@@ -245,8 +169,6 @@ if (_SorR) then
 			};
 		};
 		
-		// Set Owner to Prevent Server Local Cleanup
-		//_unit setOwner (owner _owner);
 	} forEach _posArr;
 	
 	if (VEMFDebugAI) then {
