@@ -145,7 +145,7 @@ VEMFFindTown = {
 	_cntr = (epoch_centerMarkerPosition);
 
 	// Get a list of towns
-	_townArr = nearestLocations [_cntr, ["NameCity","NameCityCapital"], 30000];
+	_townArr = nearestLocations [_cntr, VEMFLocationTypes, 30000];
 	
 	while {true} do {
 		// Pick a random town
