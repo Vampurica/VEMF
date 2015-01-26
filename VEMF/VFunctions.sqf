@@ -5,13 +5,14 @@
 
 diag_log text "[VEMF]: Loading ExecVM Functions.";
 
-VEMFSpawnAI      = "\VEMF\Scripts\VSpawnAI.sqf";
-VEMFAIKilled     = "\VEMF\Scripts\VAIKilled.sqf";
-VEMFLocalHandler = "\VEMF\Scripts\VLocalEventhandler.sqf";
-VEMFGenRanWeps   = "\VEMF\Scripts\VGenWeapons.sqf";
-VEMFLoadAddons   = "\VEMF\Scripts\VAddonLoader.sqf";
-VEMFMissWatchdog = "\VEMF\Scripts\VAIWatchdog.sqf";
-VEMFMissTimer    = "\VEMF\Scripts\VMissionTimer.sqf";
+VEMFSpawnAI       = "\VEMF\Scripts\VSpawnAI.sqf";
+VEMFSpawnSingleAI = "\VEMF\Scripts\VSpawnSingleAI.sqf";
+VEMFAIKilled      = "\VEMF\Scripts\VAIKilled.sqf";
+VEMFLocalHandler  = "\VEMF\Scripts\VLocalEventhandler.sqf";
+VEMFGenRanWeps    = "\VEMF\Scripts\VGenWeapons.sqf";
+VEMFLoadAddons    = "\VEMF\Scripts\VAddonLoader.sqf";
+VEMFMissWatchdog  = "\VEMF\Scripts\VAIWatchdog.sqf";
+VEMFMissTimer     = "\VEMF\Scripts\VMissionTimer.sqf";
 
 diag_log text "[VEMF]: Loading Compiled Functions.";
 
@@ -229,9 +230,10 @@ VEMFHousePositions = {
 
 // Vehicle Setup
 VEMFSetupVic = {
-	private ["_vehicle","_ranFuel","_config","_textureSelectionIndex","_selections","_colors","_textures","_color","_count"];
+	private ["_vehicle","_temp","_ranFuel","_config","_textureSelectionIndex","_selections","_colors","_textures","_color","_count"];
 	
 	_vehicle = _this select 0;
+	_temp    = _this select 1;
 	
 	waitUntil {(!isNull _vehicle)};
 	
@@ -286,9 +288,59 @@ VEMFSetupVic = {
 	};
 	
 	// Set Vehicle Init
-	_vehicle call EPOCH_server_vehicleInit;
+	if (_temp) then {
+		_vehicle addEventHandler ["GetIn",{
+			VEMFWarnMessage = "Vehicle Will Disappear on Restart!";
+			(owner (_this select 2)) publicVariableClient "VEMFWarnMessage";
+		}];
+	} else {
+		_vehicle call EPOCH_server_vehicleInit;
+	};
 
 	true
+};
+
+// Fills a Vehicle with AI
+VEMFFillVeh = {
+	private ["_vehicle","_addCargo","_safePos","_driver","_gunner","_cargo","_grp"];
+	
+	_vehicle = _this select 0;
+	_addCargo = _this select 1;
+	_safePos = (getpos _vehicle) findEmptyPosition [0,30,"I_Soldier_EPOCH"];
+	
+	// Add Driver
+	_driver = [_safePos] call VEMFSpawnSingleAI;
+	_driver moveInDriver _vehicle;
+	
+	// Add Gunner(s)
+	for "_i" from 1 to (_vehicle emptyPositions "Gunner") do {
+		_gunner = [_safePos] call VEMFSpawnSingleAI;
+		_gunner moveInGunner _vehicle;
+	};
+	
+	// Add Cargo Crew
+	if (_addCargo) then {
+		for "_i" from 1 to (_vehicle emptyPositions "Cargo") do {
+			_cargo = [_safePos] call VEMFSpawnSingleAI;
+			_cargo moveInCargo _vehicle;
+		};
+	};
+	
+	// Group Units in Vehicle
+	_grp = createGroup RESISTANCE;
+	_grp setBehaviour "SAFE";
+	_grp setCombatMode "YELLOW";
+	
+	{
+		[_x] joinSilent _grp;
+	} forEach (crew _vehicle);
+	
+	// Make Driver Leader
+	_driver setSkill 1;
+	_grp selectLeader _driver;
+	
+	// Return Group
+	_grp
 };
 
 // Random Fuel
@@ -426,12 +478,15 @@ VEMFLoadAIGear = {
 };
 
 VEMFLoadLoot = {
-	private ["_crate","_var","_tmp","_kindOf","_report","_cAmmo"];
+	private ["_crate","_delay","_var","_tmp","_kindOf","_report","_cAmmo"];
 	
 	_crate = _this select 0;
+	_delay = _this select 1;
 	
-	// Delay Cleanup
-	_crate setVariable ["LAST_CHECK", (diag_tickTime + 1800)];
+	if (_delay) then {
+		// Delay Cleanup
+		_crate setVariable ["LAST_CHECK", (diag_tickTime + 1800)];
+	};
 	
 	// Empty Crate
 	clearWeaponCargoGlobal _crate;
