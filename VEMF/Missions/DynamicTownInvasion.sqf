@@ -83,7 +83,7 @@ _cratePos = (_canTown select 1) findEmptyPosition [0,50,(typeOf _crate)];
 if ((count _cratePos) > 0) then {
 	_crate setPos _cratePos;
 };
-[_crate] call VEMFLoadLoot;
+[_crate, true] call VEMFLoadLoot;
 diag_log text format ["[VEMF]: DynTownInv: Crate Spawned At: %1 / Grid: %2", (getPosATL _crate), mapGridPosition (getPosATL _crate)];
 
 VEMFDynInv = nil;
