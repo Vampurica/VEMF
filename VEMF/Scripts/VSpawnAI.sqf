@@ -6,10 +6,9 @@
 	
 	Description:
 		Spawns AI to the target location
-		Player must be within 800m or they get Cached after spawning
 		(Write your code to spawn them after player is near)
 		
-	Usage: [_positionArray, True, SkillLvl, GroupCount] call VEMFSpawnAI;
+	Usage: [_pos, _positionArray, True, SkillLvl, GrpArrayName, GroupCount] call VEMFSpawnAI;
 		
 	Variables:
 		0: Mission Position Center
