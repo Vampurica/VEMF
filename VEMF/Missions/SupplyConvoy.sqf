@@ -2,7 +2,7 @@
 	Supply Convoy by Vampire
 */
 private ["_start","_end","_msg","_msg2","_alert","_safePos","_scoutVic","_scoutGrp","_troopTrans",
-"_troopGrp","_cargoTrans","_cargoGrp","_hitterVic","_hitterGrp","_grp","_winMsg"];
+"_troopGrp","_cargoTrans","_cargoGrp","_hitterVic","_hitterGrp","_grp","_winMsg","_result"];
 
 if (!isNil "VEMFSupplyConvoy") exitWith {
 	// Convoy Already Running
@@ -72,11 +72,16 @@ VEMFSuppConv = (units _grp);
 _grp move (_end select 1);
 
 // Wait for Mission Completion
-[(leader _grp),"VEMFSuppConv"] call VEMFWaitMissComp;
+_result = [_cargoTrans,"VEMFSuppConv",_cargoTrans,(_end select 1)] call VEMFWaitMissComp;
 
 // Finish Up
-_winMsg = ["Supply Convoy Has Been Eliminated","The Bandits are Retreating from the Area."];
-VEMFChatMsg = _winMsg;
+if (_result) then {
+	_winMsg = ["Supply Convoy Has Been Eliminated","The Bandits are Retreating from the Area."];
+	VEMFChatMsg = _winMsg;
+} else {
+	_winMsg = ["Supply Convoy Has Reached Destination","The Bandits Grip has becomes Stronger in the Area."];
+	VEMFChatMsg = _winMsg;
+};
 
 {
 	if (isPlayer _x) then {
@@ -84,7 +89,16 @@ VEMFChatMsg = _winMsg;
 	};
 } forEach playableUnits;
 
-diag_log text format ["[VEMF]: SupplyConvoy: Convoy Eliminated near %1. Mission Over.", mapGridPosition (getPosATL _cargoTrans)];
+if (_result) then {
+	diag_log text format ["[VEMF]: SupplyConvoy: Convoy Eliminated near %1. Mission Over.", mapGridPosition (getPosATL _cargoTrans)];
+} else {
+	diag_log text format ["[VEMF]: SupplyConvoy: Convoy Reached Destination near %1. Mission Over.", mapGridPosition (getPosATL _cargoTrans)];
+};
+
+if (!_result) then {
+	{ deleteVehicle _x; } forEach VEMFSuppConv;
+	{ deleteVehicle _x; } forEach [_scoutVic,_troopTrans,_cargoTrans,_hitterVic];
+};
 
 VEMFSuppConv = nil;
 VEMFSupplyConvoy = nil;
