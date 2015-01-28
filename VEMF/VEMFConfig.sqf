@@ -56,6 +56,9 @@ VEMFTimeoutTime = 20;
 // If false a mission waits forever
 VEMFTimeout = true;
 
+// Run the VEMF Advert on New Players?
+VEMFAdvert = true;
+
 // Announce to Last Killer or to Near Players?
 // Distance in Meters. 0 for Last Killer option.
 VEMFMissEndAnn = 0;
