@@ -24,8 +24,10 @@ if (_killer isKindOf "Man") then {
 		(group _unit) setFormDir ([(leader group _unit), _killer] call BIS_fnc_dirTo);
 		
 		// Move Towards Gunshots
-		if (((leader group _unit) distance _killer) <= 200) then {
-			(group _unit) move (getPos _killer);
+		if ((leader group _unit) isKindOf "Man") then {
+			if (((leader group _unit) distance _killer) <= 200) then {
+				(group _unit) move (getPos _killer);
+			};
 		};
 		
 		// Report to Mission about Killer

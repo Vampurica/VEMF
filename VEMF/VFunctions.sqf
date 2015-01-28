@@ -638,30 +638,65 @@ VEMFNearWait = {
 
 // Waits for the Mission to be Completed
 VEMFWaitMissComp = {
-    private ["_objective","_unitArrayName","_numSpawned","_numKillReq","_missDone"];
+    private ["_objective","_unitArrayName","_numSpawned","_numKillReq","_missDone","_reason"];
 	
     _objective = _this select 0;
     _unitArrayName = _this select 1;
+	_target = _this select 2;
+	_destination = _this select 3;
 	
-    call compile format["_numSpawned = count %1;",_unitArrayName];
-    _numKillReq = ceil(VEMFRequiredKillPercent * _numSpawned);
-	
-	diag_log text format["[VEMF]: (%3) Waiting for %1/%2 Units or Less to be Alive and a Player to be Near the Objective.", (_numSpawned - _numKillReq), _numSpawned, _unitArrayName];
-	
-	_missDone = false;
-    call compile format["
-		while {true} do {
-			if (count %1 <= (_numSpawned - _numKillReq)) then {
-				if ((count(_objective nearEntities [['Epoch_Male_F', 'Epoch_Female_F'], 150])) > 0) then {
-					_missDone = true;
+	if (isNil "_target") then {
+
+		call compile format["_numSpawned = count %1;",_unitArrayName];
+		_numKillReq = ceil(VEMFRequiredKillPercent * _numSpawned);
+		
+		diag_log text format["[VEMF]: (%3) Waiting for %1/%2 Units or Less to be Alive and a Player to be Near the Objective.", (_numSpawned - _numKillReq), _numSpawned, _unitArrayName];
+		
+		_missDone = false;
+		call compile format["
+			while {true} do {
+				if (count %1 <= (_numSpawned - _numKillReq)) then {
+					if ((count(_objective nearEntities [['Epoch_Male_F', 'Epoch_Female_F'], 150])) > 0) then {
+						_missDone = true;
+					};
 				};
+				if (_missDone) exitWith {};
+				uiSleep 5;
 			};
-			if (_missDone) exitWith {};
-			uiSleep 5;
-		};
-	", _unitArrayName];
+		", _unitArrayName];
+		
+		diag_log text format ["[VEMF]: WaitMissComp: Waiting Over. %1 Completed.", _unitArrayName];
 	
-	diag_log text format ["[VEMF]: WaitMissComp: Waiting Over. %1 Completed.", _unitArrayName];
+	} else {
+	
+		call compile format["_numSpawned = count %1;",_unitArrayName];
+		_numKillReq = ceil(VEMFRequiredKillPercent * _numSpawned);
+		
+		diag_log text format["[VEMF]: (%3) Waiting for %1/%2 Units or Less to be Alive and a Player to be Near the Targets.", (_numSpawned - _numKillReq), _numSpawned, _unitArrayName];
+		
+		_missDone = false;
+		call compile format["
+			while {true} do {
+				if (count %1 <= (_numSpawned - _numKillReq)) then {
+					if ((count(_objective nearEntities [['Epoch_Male_F', 'Epoch_Female_F'], 150])) > 0) then {
+						_missDone = true;
+						_reason = "was Killed.";
+						true
+					};
+				};
+				if (((getpos _target) distance _destination) <= 150) then {
+					_missDone = true;
+					_reason = "Reached Destination.";
+					false
+				};
+				if (_missDone) exitWith {};
+				uiSleep 5;
+			};
+		", _unitArrayName];
+		
+		diag_log text format ["[VEMF]: WaitMissComp: Waiting Over. %1 %2", _unitArrayName, _reason];
+		
+	};
 };
 
 /* ================================= End Of Functions ================================= */
