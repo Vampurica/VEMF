@@ -71,6 +71,3 @@ VEMFLock = false;
 
 // Launch Mission Timer
 [] ExecVM VEMFMissTimer;
-
-// Launch Advert (Self Plug)
-[] ExecVM "\VEMF\Scripts\VAdvert.sqf";
