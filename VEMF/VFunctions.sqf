@@ -5,13 +5,14 @@
 
 diag_log text "[VEMF]: Loading ExecVM Functions.";
 
-VEMFSpawnAI      = "\VEMF\Scripts\VSpawnAI.sqf";
-VEMFAIKilled     = "\VEMF\Scripts\VAIKilled.sqf";
-VEMFLocalHandler = "\VEMF\Scripts\VLocalEventhandler.sqf";
-VEMFGenRanWeps   = "\VEMF\Scripts\VGenWeapons.sqf";
-VEMFLoadAddons   = "\VEMF\Scripts\VAddonLoader.sqf";
-VEMFMissWatchdog = "\VEMF\Scripts\VAIWatchdog.sqf";
-VEMFMissTimer    = "\VEMF\Scripts\VMissionTimer.sqf";
+VEMFSpawnAI       = "\VEMF\Scripts\VSpawnAI.sqf";
+VEMFSpawnSingleAI = "\VEMF\Scripts\VSpawnSingleAI.sqf";
+VEMFAIKilled      = "\VEMF\Scripts\VAIKilled.sqf";
+VEMFLocalHandler  = "\VEMF\Scripts\VLocalEventhandler.sqf";
+VEMFGenRanWeps    = "\VEMF\Scripts\VGenWeapons.sqf";
+VEMFLoadAddons    = "\VEMF\Scripts\VAddonLoader.sqf";
+VEMFMissWatchdog  = "\VEMF\Scripts\VAIWatchdog.sqf";
+VEMFMissTimer     = "\VEMF\Scripts\VMissionTimer.sqf";
 
 diag_log text "[VEMF]: Loading Compiled Functions.";
 
@@ -140,20 +141,35 @@ VEMFRandomPos = {
 
 // Finds a Random Town on the Map
 VEMFFindTown = {
-	private ["_cntr","_townArr","_sRandomTown","_townPos","_townName","_ret"];
+	private ["_cntr","_townArr","_sRandomTown","_townPos","_townName","_nearP","_ret"];
 	
 	_cntr = (epoch_centerMarkerPosition);
 
 	// Get a list of towns
-	// Shouldn't cause lag because of the infrequency it runs (Needs Testing)
-	_townArr = nearestLocations [_cntr, ["NameCity","NameCityCapital"], 30000];
+	_townArr = nearestLocations [_cntr, VEMFLocationTypes, 30000];
 	
-	// Pick a random town
-	_sRandomTown = _townArr call BIS_fnc_selectRandom;
-	
-	// Return Name and POS
-	_townPos = [((locationPosition _sRandomTown) select 0), ((locationPosition _sRandomTown) select 1), 0];
-	_townName = (text _sRandomTown);
+	while {true} do {
+		// Pick a random town
+		_sRandomTown = _townArr call BIS_fnc_selectRandom;
+		
+		// Return Name and POS
+		_townPos = [((locationPosition _sRandomTown) select 0), ((locationPosition _sRandomTown) select 1), 0];
+		_townName = (text _sRandomTown);
+		
+		// Check Town or Loop
+		_nearP = {isPlayer _x} count (_townPos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) > 0;
+		{
+			_isBlack = false;
+            if ((_townPos distance (_x select 0)) <= (_x select 1)) exitWith
+			{
+				// Position is too close to a Blacklisted Location
+				_isBlack = true;
+			};
+        } forEach VEMFBlacklistZones;
+		if (!_nearP && !_isBlack) exitWith {};
+		
+		uiSleep 30;
+	};
 
 	_ret = [_townName, _townPos];
 	_ret
@@ -176,6 +192,9 @@ VEMFHousePositions = {
 			_houseArr = _houseArr - [_x];
 		};
 		if (str(_x buildingPos 0) == "[0,0,0]") then {
+			_houseArr = _houseArr - [_x];
+		};
+		if ((typeOf _x) in ["Land_Panelak","Land_Panelak2"]) then {
 			_houseArr = _houseArr - [_x];
 		};
 	} forEach _houseArr;
@@ -217,20 +236,18 @@ VEMFHousePositions = {
 	_fin
 };
 
-// Temporary Vehicle Setup
-// Assume to NOT Work at This Time
-// Server "May" Have an AutoSave Loop
-/* Disabled Until Later Version
+// Vehicle Setup
 VEMFSetupVic = {
-	private ["_vehicle","_vClass","_ranFuel","_config","_textureSelectionIndex","_selections","_colors","_textures","_color","_count"];
+	private ["_vehicle","_temp","_ranFuel","_config","_textureSelectionIndex","_selections","_colors","_textures","_color","_count"];
+	
 	_vehicle = _this select 0;
-	_vClass = (typeOf _vehicle);
+	_temp    = _this select 1;
 	
 	waitUntil {(!isNull _vehicle)};
 	
-	// Set Vehicle Token
-	// Will Delete if Not Set
-	_vehicle call EPOCH_server_setVToken;
+	// Set Variables
+	_vehicle setVariable ["LASTLOGOUT_EPOCH", (diag_tickTime + 604800)];
+	_vehicle setVariable ["LAST_CHECK", (diag_tickTime + 604800)];
 	
 	// Add to A3 Cleanup
 	addToRemainsCollector [_vehicle];
@@ -244,16 +261,20 @@ VEMFSetupVic = {
 	clearBackpackCargoGlobal  _vehicle;
 	clearItemCargoGlobal _vehicle;
 	
-	// Set the Vehicle Lock Time (0 Seconds)
-	// Vehicle Will Spawn Unlocked
-	_vehicle lock true;
-	_vehicle setVariable["LOCK_OWNER", "-1"];
-	_vehicle setVariable["LOCKED_TILL", serverTime];
+	// Set Vehicle Slot
+	EPOCH_VehicleSlotsLimit = EPOCH_VehicleSlotsLimit + 1;
+	EPOCH_VehicleSlots pushBack (str EPOCH_VehicleSlotsLimit);
+	_vehicle setVariable ["VEHICLE_SLOT",(EPOCH_VehicleSlots select 0),true];
+	EPOCH_VehicleSlots = EPOCH_VehicleSlots - [(EPOCH_VehicleSlots select 0)];
+	EPOCH_VehicleSlotCount = count EPOCH_VehicleSlots;
+	
+	// Set vToken
+	_vehicle call EPOCH_server_setVToken;
 	
 	// Pick a Random Color if Available
-	_config = configFile >> "CfgVehicles" >> _vClass >> "availableColors";
+	_config = configFile >> "CfgVehicles" >> (typeOf _vehicle) >> "availableColors";
 	if (isArray(_config)) then {
-		_textureSelectionIndex = configFile >> "CfgVehicles" >> _vClass >> "textureSelectionIndex";
+		_textureSelectionIndex = configFile >> "CfgVehicles" >> (typeOf _vehicle) >> "textureSelectionIndex";
 		_selections = if (isArray(_textureSelectionIndex)) then {
 			getArray(_textureSelectionIndex)
 		} else {
@@ -275,28 +296,103 @@ VEMFSetupVic = {
 	};
 	
 	// Set Vehicle Init
-	_vehicle call EPOCH_server_vehicleInit;
-	
-	// Set a Random Fuel Amount
-	_ranFuel = random 1;
-	if (_ranFuel < 0.1) then {_ranFuel = 0.1;};
-	_vehicle setFuel _ranFuel;
-	_vehicle setVelocity [0,0,1];
-	_vehicle setDir (round(random 360));
-	
-	// If the Vehicle is Temporary, Warn Players
-	if (!(VEMFSaveVehicles)) then {
+	if (_temp) then {
 		_vehicle addEventHandler ["GetIn",{
-			_nil = ["Warning: Vehicle Will Disappear on Restart!","systemChat",(_this select 2),false,true] call BIS_fnc_MP;
+			VEMFWarnMessage = "Vehicle Will Disappear on Restart!";
+			(owner (_this select 2)) publicVariableClient "VEMFWarnMessage";
 		}];
+	} else {
+		_vehicle call EPOCH_server_vehicleInit;
 	};
 
 	true
-}; */
+};
+
+// Fills a Vehicle with AI
+VEMFFillVeh = {
+	private ["_vehicle","_addCargo","_safePos","_driver","_gunner","_cargo","_grp"];
+	
+	_vehicle = _this select 0;
+	_addCargo = _this select 1;
+	_safePos = (getpos _vehicle) findEmptyPosition [0,30,"I_Soldier_EPOCH"];
+	
+	// Add Driver
+	_driver = [_safePos] call VEMFSpawnSingleAI;
+	_driver moveInDriver _vehicle;
+	
+	// Add Gunner(s)
+	for "_i" from 1 to (_vehicle emptyPositions "Gunner") do {
+		_gunner = [_safePos] call VEMFSpawnSingleAI;
+		_gunner moveInGunner _vehicle;
+	};
+	
+	// Add Cargo Crew
+	if (_addCargo) then {
+		for "_i" from 1 to (_vehicle emptyPositions "Cargo") do {
+			_cargo = [_safePos] call VEMFSpawnSingleAI;
+			_cargo moveInCargo _vehicle;
+		};
+	};
+	
+	// Group Units in Vehicle
+	_grp = createGroup RESISTANCE;
+	_grp setBehaviour "SAFE";
+	_grp setCombatMode "YELLOW";
+	
+	{
+		[_x] joinSilent _grp;
+	} forEach (crew _vehicle);
+	
+	// Make Driver Leader
+	_driver setSkill 1;
+	_grp selectLeader _driver;
+	
+	// Return Group
+	_grp
+};
+
+// Random Fuel
+VEMFRanFuel = {
+	private ["_vehicle"];
+	
+	_vehicle = _this select 0;
+	
+	if (local _vehicle) then {
+		_ranFuel = random 1;
+		if (_ranFuel < 0.1) then {_ranFuel = 0.1;};
+		_vehicle setFuel _ranFuel;
+		_vehicle setVelocity [0,0,1];
+		_vehicle setDir (round(random 360));
+		
+		true
+	} else {
+		false
+	};
+};
+
+// Levels an Object to the Terrain (Mostly)
+// Code from KK
+VEMFLevel = {
+	private ["_vic"];
+
+	_vic = _this select 0;
+	
+	if (local _vic) then {
+		_sn = surfaceNormal visiblePositionASL _vic;
+		_k = abs (_sn vectorDotProduct vectorDirVisual _vic);
+		_vic setVectorUp (
+			(_sn vectorMultiply _k) vectorAdd (
+				[0,0,1] vectorMultiply (
+					sqrt (1 - (_sn vectorDotProduct [0,0,1]) ^ 2) - _k
+				)
+			)
+		);
+	};
+};
 
 // Loads a New AI Full of Gear
 VEMFLoadAIGear = {
-	private ["_unit","_fin","_prim","_seco","_pAmmo","_hAmmo","_attachment"];
+	private ["_suppressor","_muzzle","_unit","_fin","_prim","_seco","_pAmmo","_hAmmo","_attachment"];
 	
 	_unit = _this select 0;
 	_fin = false;
@@ -317,6 +413,13 @@ VEMFLoadAIGear = {
 		
 		// Add Headgear
 		_unit addHeadGear (VEMFHeadgearList call BIS_fnc_selectRandom);
+		// All hats - race helmets
+		//_unit addHeadgear Format ["H_%1_EPOCH", floor(random 91) + 1];
+		
+		// Add NVG so AI can at night
+		if (sunOrMoon != 1) then {
+			_unit linkItem "NVG_Epoch";
+		};
 		
 		// Add Vest (Random 40 Vests)
 		/* _vVar = (floor(random 41));
@@ -336,31 +439,13 @@ VEMFLoadAIGear = {
 		_prim = VEMFRiflesList call BIS_fnc_selectRandom;
 		_seco = VEMFPistolsList call BIS_fnc_selectRandom;
 		
-		_pAmmo = [] + getArray (configFile >> "cfgWeapons" >> _prim >> "magazines");
-		{
-			if (isClass(configFile >> "CfgPricing" >> _x)) exitWith {
-				_unit addMagazine _x;
-				_unit addMagazine _x;
-				for "_i" from 0 to (floor(random 3)) do {
-					_unit addMagazine _x;
-				};
-			};
-		} forEach _pAmmo;
-		
-		_hAmmo = [] + getArray (configFile >> "cfgWeapons" >> _seco >> "magazines");
-		{
-			if (isClass(configFile >> "CfgPricing" >> _x)) exitWith {
-				_unit addMagazine _x;
-				_unit addMagazine _x;
-				for "_i" from 0 to (floor(random 4)) do {
-					_unit addMagazine _x;
-				};
-			};
-		} forEach _hAmmo;
-		
-		_unit addWeapon _prim;
+		// Add's weapon and Mags, between 2/6 Mags
+		_muzzle = [_unit, _prim, (floor(random 5) + 2)] call BIS_fnc_addWeapon;
 		_unit selectWeapon _prim;
-		_unit addWeapon _seco;
+		_muzzle = [_unit, _seco, (floor(random 2) + 2)] call BIS_fnc_addWeapon;
+		
+		// give them unlimited ammo / not fully testede
+		_unit addeventhandler ["fired", {(_this select 0) setvehicleammo 1;}];
 		
 		// Add Grenades for GL Units
 		if ((count(getArray (configFile >> "cfgWeapons" >> _prim >> "muzzles"))) > 1) then {
@@ -379,6 +464,30 @@ VEMFLoadAIGear = {
 			_unit addPrimaryWeaponItem (_attachment select 0);
 		};
 		
+		// 20% chance for accessories
+		if(floor(random 100) < 20) then {
+			_unit addPrimaryWeaponItem (["acc_pointer_IR","acc_flashlight"] call BIS_fnc_selectRandom);
+		};
+		
+		// 10% chance for accessories
+		if(floor(random 100) < 10) then {
+			_suppressor = _prim call find_suitable_suppressor;
+			if(_suppressor != "") then {
+				_unit addPrimaryWeaponItem _suppressor;
+			};
+			
+		};
+		
+		// if AI spawns on water make them ready for it
+		if (surfaceIsWater (position _unit)) then {
+			removeHeadgear _unit;
+			_unit forceAddUniform "U_O_Wetsuit" ;
+			_unit addVest "V_20";
+			_unit addGoggles "G_Diving";
+			_muzzle = [_unit, "arifle_SDAR_F", 3, "20Rnd_556x45_UW_mag"] call BIS_fnc_addWeapon;
+
+		};
+		
 		if (VEMFDebugFunc) then {
 			diag_log text format ["[VEMF]: LoadGear: Uniform: %1 / Vest: %2 / Hat: %3 / Weps: %4 / Mags: %5", (uniform _unit), (vest _unit), (headgear _unit), (weapons _unit), (magazines _unit)];
 		};
@@ -390,12 +499,15 @@ VEMFLoadAIGear = {
 };
 
 VEMFLoadLoot = {
-	private ["_crate","_var","_tmp","_kindOf","_report","_cAmmo"];
+	private ["_crate","_delay","_var","_tmp","_kindOf","_report","_cAmmo"];
 	
 	_crate = _this select 0;
+	_delay = _this select 1;
 	
-	// Delay Cleanup
-	_crate setVariable ["LAST_CHECK", (diag_tickTime + 1800)];
+	if (_delay) then {
+		// Delay Cleanup
+		_crate setVariable ["LAST_CHECK", (diag_tickTime + 1800)];
+	};
 	
 	// Empty Crate
 	clearWeaponCargoGlobal _crate;
@@ -547,30 +659,112 @@ VEMFNearWait = {
 
 // Waits for the Mission to be Completed
 VEMFWaitMissComp = {
-    private ["_objective","_unitArrayName","_numSpawned","_numKillReq","_missDone"];
+    private ["_objective","_unitArrayName","_numSpawned","_numKillReq","_missDone","_reason"];
 	
     _objective = _this select 0;
     _unitArrayName = _this select 1;
+	_target = _this select 2;
+	_destination = _this select 3;
 	
-    call compile format["_numSpawned = count %1;",_unitArrayName];
-    _numKillReq = ceil(VEMFRequiredKillPercent * _numSpawned);
-	
-	diag_log text format["[VEMF]: (%3) Waiting for %1/%2 Units or Less to be Alive and a Player to be Near the Objective.", (_numSpawned - _numKillReq), _numSpawned, _unitArrayName];
-	
-	_missDone = false;
-    call compile format["
-		while {true} do {
-			if (count %1 <= (_numSpawned - _numKillReq)) then {
-				if ((count(_objective nearEntities [['Epoch_Male_F', 'Epoch_Female_F'], 150])) > 0) then {
-					_missDone = true;
+	if (isNil "_target") then {
+
+		call compile format["_numSpawned = count %1;",_unitArrayName];
+		_numKillReq = ceil(VEMFRequiredKillPercent * _numSpawned);
+		
+		diag_log text format["[VEMF]: (%3) Waiting for %1/%2 Units or Less to be Alive and a Player to be Near the Objective.", (_numSpawned - _numKillReq), _numSpawned, _unitArrayName];
+		
+		_missDone = false;
+		call compile format["
+			while {true} do {
+				if (count %1 <= (_numSpawned - _numKillReq)) then {
+					if ((count(_objective nearEntities [['Epoch_Male_F', 'Epoch_Female_F'], 150])) > 0) then {
+						_missDone = true;
+					};
 				};
+				if (_missDone) exitWith {};
+				uiSleep 5;
 			};
-			if (_missDone) exitWith {};
-			uiSleep 5;
-		};
-	", _unitArrayName];
+		", _unitArrayName];
+		
+		diag_log text format ["[VEMF]: WaitMissComp: Waiting Over. %1 Completed.", _unitArrayName];
 	
-	diag_log text format ["[VEMF]: WaitMissComp: Waiting Over. %1 Completed.", _unitArrayName];
+	} else {
+	
+		call compile format["_numSpawned = count %1;",_unitArrayName];
+		_numKillReq = ceil(VEMFRequiredKillPercent * _numSpawned);
+		
+		diag_log text format["[VEMF]: (%3) Waiting for %1/%2 Units or Less to be Alive and a Player to be Near the Targets.", (_numSpawned - _numKillReq), _numSpawned, _unitArrayName];
+		
+		_missDone = false;
+		call compile format["
+			while {true} do {
+				if (count %1 <= (_numSpawned - _numKillReq)) then {
+					if ((count(_objective nearEntities [['Epoch_Male_F', 'Epoch_Female_F'], 150])) > 0) then {
+						_missDone = true;
+						_reason = "was Killed.";
+						true
+					};
+				};
+				if (((getpos _target) distance _destination) <= 150) then {
+					_missDone = true;
+					_reason = "Reached Destination.";
+					false
+				};
+				if (_missDone) exitWith {};
+				uiSleep 5;
+			};
+		", _unitArrayName];
+		
+		diag_log text format ["[VEMF]: WaitMissComp: Waiting Over. %1 %2", _unitArrayName, _reason];
+		
+	};
+};
+find_suitable_suppressor = {
+	
+	private["_weapon","_result","_ammoName"];
+
+	_result 	= "";
+	_weapon 	= _this;
+	_ammoName	= getText  (configFile >> "cfgWeapons" >> _weapon >> "displayName");
+
+	if(["5.56", _ammoName] call KK_fnc_inString) then {
+		_result = "muzzle_snds_M";
+	};
+	if(["6.5", _ammoName] call KK_fnc_inString) then {
+		_result = "muzzle_snds_H";
+	};
+	if(["7.62", _ammoName] call KK_fnc_inString) then {
+		_result = "muzzle_snds_H";
+	};
+	
+	_result
+};
+/*
+Parameter(s):
+    _this select 0: <string> string to be found
+    _this select 1: <string> string to search in
+*/
+KK_fnc_inString = {
+
+	private ["_needle","_haystack","_needleLen","_hay","_found"]; 
+
+	_needle 	= [_this, 0, "", [""]] call BIS_fnc_param; 
+	
+	_haystack 	= toArray ([_this, 1, "", [""]] call BIS_fnc_param); 
+	_needleLen 	= count toArray _needle;
+	
+	_hay 		= +_haystack; 
+	_hay 		resize _needleLen;
+	_found 		= false; 
+
+	for "_i" from _needleLen to count _haystack do { 
+
+		if (toString _hay == _needle) exitWith {_found = true};
+		_hay set [_needleLen, _haystack select _i]; 
+		_hay set [0, "x"]; _hay = _hay - ["x"]
+	 }; 
+
+	_found
 };
 
 /* ================================= End Of Functions ================================= */
