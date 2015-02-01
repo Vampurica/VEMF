@@ -392,7 +392,7 @@ VEMFLevel = {
 
 // Loads a New AI Full of Gear
 VEMFLoadAIGear = {
-	private ["_muzzle","_unit","_fin","_prim","_seco","_pAmmo","_hAmmo","_attachment"];
+	private ["_suppressor","_muzzle","_unit","_fin","_prim","_seco","_pAmmo","_hAmmo","_attachment"];
 	
 	_unit = _this select 0;
 	_fin = false;
@@ -439,33 +439,9 @@ VEMFLoadAIGear = {
 		_prim = VEMFRiflesList call BIS_fnc_selectRandom;
 		_seco = VEMFPistolsList call BIS_fnc_selectRandom;
 		
-		/*_pAmmo = [] + getArray (configFile >> "cfgWeapons" >> _prim >> "magazines");
-		{
-			if (isClass(configFile >> "CfgPricing" >> _x)) exitWith {
-				_unit addMagazine _x;
-				_unit addMagazine _x;
-				for "_i" from 0 to (floor(random 3)) do {
-					_unit addMagazine _x;
-				};
-			};
-		} forEach _pAmmo;*/
-		
-		_hAmmo = [] + getArray (configFile >> "cfgWeapons" >> _seco >> "magazines");
-		{
-			if (isClass(configFile >> "CfgPricing" >> _x)) exitWith {
-				_unit addMagazine _x;
-				_unit addMagazine _x;
-				for "_i" from 0 to (floor(random 4)) do {
-					_unit addMagazine _x;
-				};
-			};
-		} forEach _hAmmo;
-		
 		// Add's weapon and Mags, between 2/6 Mags
 		_muzzle = [_unit, _prim, (floor(random 5) + 2)] call BIS_fnc_addWeapon;
-		//_unit addWeapon _prim;
 		_unit selectWeapon _prim;
-		//_unit addWeapon _seco;
 		_muzzle = [_unit, _seco, (floor(random 2) + 2)] call BIS_fnc_addWeapon;
 		
 		// give them unlimited ammo / not fully testede
@@ -495,7 +471,7 @@ VEMFLoadAIGear = {
 		
 		// 10% chance for accessories
 		if(floor(random 100) < 10) then {
-			_suppressor = _aiweapon call find_suitable_suppressor;
+			_suppressor = _prim call find_suitable_suppressor;
 			if(_suppressor != "") then {
 				_unit addPrimaryWeaponItem _suppressor;
 			};
