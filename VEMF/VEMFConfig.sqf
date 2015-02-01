@@ -61,7 +61,7 @@ VEMFTimeout = true;
 VEMFMissEndAnn = 0;
 
 // Mission Name Array
-VEMFMissionArray = ["DynamicTownInvasion","SupplyConvoy","AtoBDelivery"];
+VEMFMissionArray = ["DynamicTownInvasion","SupplyConvoy","AtoBDelivery","NukeTown"];
 
 // Dynamic Town Location Array
 VEMFLocationTypes = ["NameCity","NameCityCapital"];
