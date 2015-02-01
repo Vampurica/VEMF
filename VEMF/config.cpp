@@ -9,3 +9,13 @@ class CfgPatches
 		author[]= {"Vampire"}; 
 	};
 };
+class CfgFunctions {
+    class Mission1 {
+        class main {
+            file = "\VEMF";
+            class init {
+                postInit = 1;
+            };
+        };
+    };
+};
