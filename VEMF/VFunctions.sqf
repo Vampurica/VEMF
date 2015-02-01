@@ -6,7 +6,6 @@
 diag_log text "[VEMF]: Loading ExecVM Functions.";
 
 VEMFSpawnAI       = "\VEMF\Scripts\VSpawnAI.sqf";
-VEMFSpawnSingleAI = "\VEMF\Scripts\VSpawnSingleAI.sqf";
 VEMFAIKilled      = "\VEMF\Scripts\VAIKilled.sqf";
 VEMFLocalHandler  = "\VEMF\Scripts\VLocalEventhandler.sqf";
 VEMFGenRanWeps    = "\VEMF\Scripts\VGenWeapons.sqf";
@@ -234,6 +233,51 @@ VEMFHousePositions = {
 	// Returns in the following format
 	// Nested Array = [[HousePos1,Pos2,Pos3],[Pos1,Pos2],[Pos1,Pos2]];
 	_fin
+};
+
+VEMFSpawnSingleAI = {
+	private ["_pos","_sldrClass","_grp","_unit"];
+
+	_pos = _this select 0;
+
+	if ((isNil "_pos") || (count _pos < 3)) exitWith {};
+
+	if (VEMFDebugAI) then {
+		diag_log text format ["[VEMF]: Single AI Spawn Vars: %1", _pos];
+	};
+
+	_sldrClass = "I_Soldier_EPOCH";
+
+	// Create the Group
+	_grp = createGroup RESISTANCE;
+	_grp setBehaviour "AWARE";
+	_grp setCombatMode "YELLOW";
+
+	// Create the Unit
+	_unit = _grp createUnit [_sldrClass, _pos, [], 0, "FORM"];
+
+	// Load the AI
+	[_unit] call VEMFLoadAIGear;
+
+	// Enable its AI
+	_unit setSkill 0.6;
+	_unit setRank "Private";
+	_unit enableAI "TARGET";
+	_unit enableAI "AUTOTARGET";
+	_unit enableAI "MOVE";
+	_unit enableAI "ANIM";
+	// Might write a custom FSM in the future
+	// Default Arma 3 Soldier FSM for now
+	_unit enableAI "FSM";
+
+	// Prepare for Cleanup or Caching
+	_unit addEventHandler ["Killed",{ [(_this select 0), (_this select 1)] ExecVM VEMFAIKilled; }];
+	_unit setVariable ["VEMFUArray", _arrName];
+	_unit setVariable ["VEMFAI", true];
+	_unit setVariable ["LASTLOGOUT_EPOCH", (diag_tickTime + 14400)];
+
+	// Return the Unit
+	_unit
 };
 
 // Vehicle Setup
