@@ -38,24 +38,24 @@ if (!_alert) exitWith {
 _safePos = (_start select 1) findEmptyPosition [0,50,"I_G_Offroad_01_F"];
 _scoutVic = createVehicle ["I_G_Offroad_01_F",_safePos,[],0,"CAN_COLLIDE"];
 [_scoutVic, true] call VEMFSetupVic;
-_scoutGrp = [_scoutVic, false] call VEMFFillVic;
+_scoutGrp = [_scoutVic, false] call VEMFFillVeh;
 
 _safePos = (_start select 1) findEmptyPosition [0,50,"I_Truck_02_transport_F"];
 _troopTrans = createVehicle ["I_Truck_02_transport_F",_safePos,[],0,"CAN_COLLIDE"];
 [_troopTrans, true] call VEMFSetupVic;
-_troopGrp = [_troopTrans, true] call VEMFFillVic;
+_troopGrp = [_troopTrans, true] call VEMFFillVeh;
 [_troopTrans, false] call VEMFLoadLoot;
 
 _safePos = (_start select 1) findEmptyPosition [0,50,"I_Truck_02_box_F"];
 _cargoTrans = createVehicle ["I_Truck_02_box_F",_safePos,[],0,"CAN_COLLIDE"];
 [_cargoTrans, true] call VEMFSetupVic;
-_cargoGrp = [_cargoTrans, false] call VEMFFillVic;
+_cargoGrp = [_cargoTrans, false] call VEMFFillVeh;
 [_cargoTrans, false] call VEMFLoadLoot;
 
 _safePos = (_start select 1) findEmptyPosition [0,50,"I_G_Offroad_01_armed_F"];
 _hitterVic = createVehicle ["I_G_Offroad_01_armed_F",_safePos,[],0,"CAN_COLLIDE"];
 [_hitterVic, true] call VEMFSetupVic;
-_hitterGrp = [_hitterVic, true] call VEMFFillVic;
+_hitterGrp = [_hitterVic, true] call VEMFFillVeh;
 [_hitterVic, false] call VEMFLoadLoot;
 
 // Group the Groups
