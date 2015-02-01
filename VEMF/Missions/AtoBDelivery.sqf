@@ -21,7 +21,7 @@ while {true} do {
 };
 
 // Spawn Vehicle (Temporary)
-_safePos = (start select 1);
+_safePos = (_start select 1);
 _safePos = (_start select 1) findEmptyPosition [0,50,"B_Truck_01_box_F"];
 _transport = createVehicle ["B_Truck_01_box_F",_safePos,[],0,"CAN_COLLIDE"];
 [_transport, true] call VEMFSetupVic;
