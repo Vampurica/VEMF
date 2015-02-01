@@ -158,7 +158,15 @@ VEMFFindTown = {
 		
 		// Check Town or Loop
 		_nearP = {isPlayer _x} count (_townPos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) > 0;
-		if (!_nearP) exitWith {};
+		{
+			_isBlack = false;
+            if ((_townPos distance (_x select 0)) <= (_x select 1)) exitWith
+			{
+				// Position is too close to a Blacklisted Location
+				_isBlack = true;
+			};
+        } forEach VEMFBlacklistZones;
+		if (!_nearP && !_isBlack) exitWith {};
 		
 		uiSleep 30;
 	};
