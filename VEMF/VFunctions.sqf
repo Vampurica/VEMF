@@ -392,7 +392,7 @@ VEMFLevel = {
 
 // Loads a New AI Full of Gear
 VEMFLoadAIGear = {
-	private ["_unit","_fin","_prim","_seco","_pAmmo","_hAmmo","_attachment"];
+	private ["_muzzle","_unit","_fin","_prim","_seco","_pAmmo","_hAmmo","_attachment"];
 	
 	_unit = _this select 0;
 	_fin = false;
@@ -413,6 +413,13 @@ VEMFLoadAIGear = {
 		
 		// Add Headgear
 		_unit addHeadGear (VEMFHeadgearList call BIS_fnc_selectRandom);
+		// All hats - race helmets
+		//_unit addHeadgear Format ["H_%1_EPOCH", floor(random 91) + 1];
+		
+		// Add NVG so AI can at night
+		if (sunOrMoon != 1) then {
+			_unit linkItem "NVG_Epoch";
+		};
 		
 		// Add Vest (Random 40 Vests)
 		/* _vVar = (floor(random 41));
@@ -432,7 +439,7 @@ VEMFLoadAIGear = {
 		_prim = VEMFRiflesList call BIS_fnc_selectRandom;
 		_seco = VEMFPistolsList call BIS_fnc_selectRandom;
 		
-		_pAmmo = [] + getArray (configFile >> "cfgWeapons" >> _prim >> "magazines");
+		/*_pAmmo = [] + getArray (configFile >> "cfgWeapons" >> _prim >> "magazines");
 		{
 			if (isClass(configFile >> "CfgPricing" >> _x)) exitWith {
 				_unit addMagazine _x;
@@ -441,7 +448,7 @@ VEMFLoadAIGear = {
 					_unit addMagazine _x;
 				};
 			};
-		} forEach _pAmmo;
+		} forEach _pAmmo;*/
 		
 		_hAmmo = [] + getArray (configFile >> "cfgWeapons" >> _seco >> "magazines");
 		{
@@ -454,9 +461,15 @@ VEMFLoadAIGear = {
 			};
 		} forEach _hAmmo;
 		
-		_unit addWeapon _prim;
+		// Add's weapon and Mags, between 2/6 Mags
+		_muzzle = [_unit, _prim, (floor(random 5) + 2)] call BIS_fnc_addWeapon;
+		//_unit addWeapon _prim;
 		_unit selectWeapon _prim;
-		_unit addWeapon _seco;
+		//_unit addWeapon _seco;
+		_muzzle = [_unit, _seco, (floor(random 2) + 2)] call BIS_fnc_addWeapon;
+		
+		// give them unlimited ammo / not fully testede
+		_unit addeventhandler ["fired", {(_this select 0) setvehicleammo 1;}];
 		
 		// Add Grenades for GL Units
 		if ((count(getArray (configFile >> "cfgWeapons" >> _prim >> "muzzles"))) > 1) then {
@@ -473,6 +486,30 @@ VEMFLoadAIGear = {
 		if ((floor(random(10))) == 5) then {
 			_attachment = (getArray (configFile >> "cfgLootTable" >> "Scopes" >> "items")) call BIS_fnc_selectRandom;
 			_unit addPrimaryWeaponItem (_attachment select 0);
+		};
+		
+		// 20% chance for accessories
+		if(floor(random 100) < 20) then {
+			_unit addPrimaryWeaponItem (["acc_pointer_IR","acc_flashlight"] call BIS_fnc_selectRandom);
+		};
+		
+		// 10% chance for accessories
+		if(floor(random 100) < 10) then {
+			_suppressor = _aiweapon call find_suitable_suppressor;
+			if(_suppressor != "") then {
+				_unit addPrimaryWeaponItem _suppressor;
+			};
+			
+		};
+		
+		// if AI spawns on water make them ready for it
+		if (surfaceIsWater (position _unit)) then {
+			removeHeadgear _unit;
+			_unit forceAddUniform "U_O_Wetsuit" ;
+			_unit addVest "V_20";
+			_unit addGoggles "G_Diving";
+			_muzzle = [_unit, "arifle_SDAR_F", 3, "20Rnd_556x45_UW_mag"] call BIS_fnc_addWeapon;
+
 		};
 		
 		if (VEMFDebugFunc) then {
@@ -705,6 +742,53 @@ VEMFWaitMissComp = {
 		diag_log text format ["[VEMF]: WaitMissComp: Waiting Over. %1 %2", _unitArrayName, _reason];
 		
 	};
+};
+find_suitable_suppressor = {
+	
+	private["_weapon","_result","_ammoName"];
+
+	_result 	= "";
+	_weapon 	= _this;
+	_ammoName	= getText  (configFile >> "cfgWeapons" >> _weapon >> "displayName");
+
+	if(["5.56", _ammoName] call KK_fnc_inString) then {
+		_result = "muzzle_snds_M";
+	};
+	if(["6.5", _ammoName] call KK_fnc_inString) then {
+		_result = "muzzle_snds_H";
+	};
+	if(["7.62", _ammoName] call KK_fnc_inString) then {
+		_result = "muzzle_snds_H";
+	};
+	
+	_result
+};
+/*
+Parameter(s):
+    _this select 0: <string> string to be found
+    _this select 1: <string> string to search in
+*/
+KK_fnc_inString = {
+
+	private ["_needle","_haystack","_needleLen","_hay","_found"]; 
+
+	_needle 	= [_this, 0, "", [""]] call BIS_fnc_param; 
+	
+	_haystack 	= toArray ([_this, 1, "", [""]] call BIS_fnc_param); 
+	_needleLen 	= count toArray _needle;
+	
+	_hay 		= +_haystack; 
+	_hay 		resize _needleLen;
+	_found 		= false; 
+
+	for "_i" from _needleLen to count _haystack do { 
+
+		if (toString _hay == _needle) exitWith {_found = true};
+		_hay set [_needleLen, _haystack select _i]; 
+		_hay set [0, "x"]; _hay = _hay - ["x"]
+	 }; 
+
+	_found
 };
 
 /* ================================= End Of Functions ================================= */
