@@ -732,13 +732,13 @@ VEMFWaitMissComp = {
 				if (count %1 <= (_numSpawned - _numKillReq)) then {
 					if ((count(_objective nearEntities [['Epoch_Male_F', 'Epoch_Female_F'], 150])) > 0) then {
 						_missDone = true;
-						_reason = "was Killed.";
+						_reason = 'was Killed.';
 						true
 					};
 				};
 				if (((getpos _target) distance _destination) <= 150) then {
 					_missDone = true;
-					_reason = "Reached Destination.";
+					_reason = 'Reached Destination.';
 					false
 				};
 				if (_missDone) exitWith {};
