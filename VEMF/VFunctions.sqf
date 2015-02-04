@@ -694,8 +694,16 @@ VEMFWaitMissComp = {
 	
     _objective = _this select 0;
     _unitArrayName = _this select 1;
-	_target = _this select 2;
-	_destination = _this select 3;
+    
+    if (count _this > 2) then {
+		_target		= _this select 2;
+	} else {
+		_target 	= nil;
+	};
+	
+	if (count _this > 3) then {
+		_destination = _this select 3;
+	};
 	
 	if (isNil "_target") then {
 
