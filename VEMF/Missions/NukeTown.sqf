@@ -94,9 +94,9 @@ while {true} do {
 	};
 	if ((diag_tickTime - _time) > 60) exitWith {
 		// Nuke the Town
+		_bomb = "Bo_GBU12_LGB" createVehicle (getpos _nuke);
+		_bomb setVelocity [100,0,0];
 		{
-			_bomb = "Bo_GBU12_LGB" createVehicle (getpos _x);
-			_bomb setVelocity [100,0,0];
 			_x setDamage 1;
 		} forEach (_nuke nearObjects 400);
 		
