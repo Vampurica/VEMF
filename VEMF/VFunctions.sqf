@@ -553,7 +553,7 @@ VEMFLoadLoot = {
 		{
 			_tmp = (getArray(_x >> 'items'));
 			for "_z" from 0 to ((count(_tmp))-1) do {
-				VEMFLootList = VEMFLootList + [((_tmp select _z) select 0)];
+				{VEMFLootList = VEMFLootList + [((_tmp select _z) select 0)];} forEach (_temp);
 			};
 		} forEach ("configName _x != 'Uniforms' && configName _x != 'Headgear'" configClasses (configFile >> "CfgLootTable"));
 		
