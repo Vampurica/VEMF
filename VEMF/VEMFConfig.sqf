@@ -53,7 +53,7 @@ VEMFMaxMissTime = 20;
 VEMFTimeoutTime = 20;
 
 // Enable Timeout?
-// In false waits forever
+// If false a mission waits forever
 VEMFTimeout = true;
 
 // Announce to Last Killer or to Near Players?
@@ -61,7 +61,10 @@ VEMFTimeout = true;
 VEMFMissEndAnn = 0;
 
 // Mission Name Array
-VEMFMissionArray = ["DynamicTownInvasion"];
+VEMFMissionArray = ["DynamicTownInvasion","SupplyConvoy","AtoBDelivery","NukeTown"];
+
+// Dynamic Town Location Array
+VEMFLocationTypes = ["NameCity","NameCityCapital"];
 
 // Custom Addon Array (Don't Touch Unless You're Positive)
 // What is your addon script name?

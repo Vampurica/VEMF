@@ -5,13 +5,13 @@
 
 diag_log text "[VEMF]: Loading ExecVM Functions.";
 
-VEMFSpawnAI      = "\VEMF\Scripts\VSpawnAI.sqf";
-VEMFAIKilled     = "\VEMF\Scripts\VAIKilled.sqf";
-VEMFLocalHandler = "\VEMF\Scripts\VLocalEventhandler.sqf";
-VEMFGenRanWeps   = "\VEMF\Scripts\VGenWeapons.sqf";
-VEMFLoadAddons   = "\VEMF\Scripts\VAddonLoader.sqf";
-VEMFMissWatchdog = "\VEMF\Scripts\VAIWatchdog.sqf";
-VEMFMissTimer    = "\VEMF\Scripts\VMissionTimer.sqf";
+VEMFSpawnAI       = "\VEMF\Scripts\VSpawnAI.sqf";
+VEMFAIKilled      = "\VEMF\Scripts\VAIKilled.sqf";
+VEMFLocalHandler  = "\VEMF\Scripts\VLocalEventhandler.sqf";
+VEMFGenRanWeps    = "\VEMF\Scripts\VGenWeapons.sqf";
+VEMFLoadAddons    = "\VEMF\Scripts\VAddonLoader.sqf";
+VEMFMissWatchdog  = "\VEMF\Scripts\VAIWatchdog.sqf";
+VEMFMissTimer     = "\VEMF\Scripts\VMissionTimer.sqf";
 
 diag_log text "[VEMF]: Loading Compiled Functions.";
 
@@ -140,20 +140,35 @@ VEMFRandomPos = {
 
 // Finds a Random Town on the Map
 VEMFFindTown = {
-	private ["_cntr","_townArr","_sRandomTown","_townPos","_townName","_ret"];
+	private ["_cntr","_townArr","_sRandomTown","_townPos","_townName","_nearP","_ret"];
 	
 	_cntr = (epoch_centerMarkerPosition);
 
 	// Get a list of towns
-	// Shouldn't cause lag because of the infrequency it runs (Needs Testing)
-	_townArr = nearestLocations [_cntr, ["NameCity","NameCityCapital"], 30000];
+	_townArr = nearestLocations [_cntr, VEMFLocationTypes, 30000];
 	
-	// Pick a random town
-	_sRandomTown = _townArr call BIS_fnc_selectRandom;
-	
-	// Return Name and POS
-	_townPos = [((locationPosition _sRandomTown) select 0), ((locationPosition _sRandomTown) select 1), 0];
-	_townName = (text _sRandomTown);
+	while {true} do {
+		// Pick a random town
+		_sRandomTown = _townArr call BIS_fnc_selectRandom;
+		
+		// Return Name and POS
+		_townPos = [((locationPosition _sRandomTown) select 0), ((locationPosition _sRandomTown) select 1), 0];
+		_townName = (text _sRandomTown);
+		
+		// Check Town or Loop
+		_nearP = {isPlayer _x} count (_townPos nearEntities [["Epoch_Male_F", "Epoch_Female_F"], 800]) > 0;
+		{
+			_isBlack = false;
+            if ((_townPos distance (_x select 0)) <= (_x select 1)) exitWith
+			{
+				// Position is too close to a Blacklisted Location
+				_isBlack = true;
+			};
+        } forEach VEMFBlacklistZones;
+		if (!_nearP && !_isBlack) exitWith {};
+		
+		uiSleep 30;
+	};
 
 	_ret = [_townName, _townPos];
 	_ret
@@ -176,6 +191,9 @@ VEMFHousePositions = {
 			_houseArr = _houseArr - [_x];
 		};
 		if (str(_x buildingPos 0) == "[0,0,0]") then {
+			_houseArr = _houseArr - [_x];
+		};
+		if ((typeOf _x) in ["Land_Panelak","Land_Panelak2"]) then {
 			_houseArr = _houseArr - [_x];
 		};
 	} forEach _houseArr;
@@ -217,20 +235,63 @@ VEMFHousePositions = {
 	_fin
 };
 
-// Temporary Vehicle Setup
-// Assume to NOT Work at This Time
-// Server "May" Have an AutoSave Loop
-/* Disabled Until Later Version
+VEMFSpawnSingleAI = {
+	private ["_pos","_sldrClass","_grp","_unit"];
+
+	_pos = _this select 0;
+
+	if ((isNil "_pos") || (count _pos < 3)) exitWith {};
+
+	if (VEMFDebugAI) then {
+		diag_log text format ["[VEMF]: Single AI Spawn Vars: %1", _pos];
+	};
+
+	_sldrClass = "I_Soldier_EPOCH";
+
+	// Create the Group
+	_grp = createGroup RESISTANCE;
+	_grp setBehaviour "AWARE";
+	_grp setCombatMode "YELLOW";
+
+	// Create the Unit
+	_unit = _grp createUnit [_sldrClass, _pos, [], 0, "FORM"];
+
+	// Load the AI
+	[_unit] call VEMFLoadAIGear;
+
+	// Enable its AI
+	_unit setSkill 0.6;
+	_unit setRank "Private";
+	_unit enableAI "TARGET";
+	_unit enableAI "AUTOTARGET";
+	_unit enableAI "MOVE";
+	_unit enableAI "ANIM";
+	// Might write a custom FSM in the future
+	// Default Arma 3 Soldier FSM for now
+	_unit enableAI "FSM";
+
+	// Prepare for Cleanup or Caching
+	_unit addEventHandler ["Killed",{ [(_this select 0), (_this select 1)] ExecVM VEMFAIKilled; }];
+	_unit setVariable ["VEMFUArray", _arrName];
+	_unit setVariable ["VEMFAI", true];
+	_unit setVariable ["LASTLOGOUT_EPOCH", (diag_tickTime + 14400)];
+
+	// Return the Unit
+	_unit
+};
+
+// Vehicle Setup
 VEMFSetupVic = {
-	private ["_vehicle","_vClass","_ranFuel","_config","_textureSelectionIndex","_selections","_colors","_textures","_color","_count"];
+	private ["_vehicle","_temp","_ranFuel","_config","_textureSelectionIndex","_selections","_colors","_textures","_color","_count"];
+	
 	_vehicle = _this select 0;
-	_vClass = (typeOf _vehicle);
+	_temp    = _this select 1;
 	
 	waitUntil {(!isNull _vehicle)};
 	
-	// Set Vehicle Token
-	// Will Delete if Not Set
-	_vehicle call EPOCH_server_setVToken;
+	// Set Variables
+	_vehicle setVariable ["LASTLOGOUT_EPOCH", (diag_tickTime + 604800)];
+	_vehicle setVariable ["LAST_CHECK", (diag_tickTime + 604800)];
 	
 	// Add to A3 Cleanup
 	addToRemainsCollector [_vehicle];
@@ -244,16 +305,20 @@ VEMFSetupVic = {
 	clearBackpackCargoGlobal  _vehicle;
 	clearItemCargoGlobal _vehicle;
 	
-	// Set the Vehicle Lock Time (0 Seconds)
-	// Vehicle Will Spawn Unlocked
-	_vehicle lock true;
-	_vehicle setVariable["LOCK_OWNER", "-1"];
-	_vehicle setVariable["LOCKED_TILL", serverTime];
+	// Set Vehicle Slot
+	EPOCH_VehicleSlotsLimit = EPOCH_VehicleSlotsLimit + 1;
+	EPOCH_VehicleSlots pushBack (str EPOCH_VehicleSlotsLimit);
+	_vehicle setVariable ["VEHICLE_SLOT",(EPOCH_VehicleSlots select 0),true];
+	EPOCH_VehicleSlots = EPOCH_VehicleSlots - [(EPOCH_VehicleSlots select 0)];
+	EPOCH_VehicleSlotCount = count EPOCH_VehicleSlots;
+	
+	// Set vToken
+	_vehicle call EPOCH_server_setVToken;
 	
 	// Pick a Random Color if Available
-	_config = configFile >> "CfgVehicles" >> _vClass >> "availableColors";
+	_config = configFile >> "CfgVehicles" >> (typeOf _vehicle) >> "availableColors";
 	if (isArray(_config)) then {
-		_textureSelectionIndex = configFile >> "CfgVehicles" >> _vClass >> "textureSelectionIndex";
+		_textureSelectionIndex = configFile >> "CfgVehicles" >> (typeOf _vehicle) >> "textureSelectionIndex";
 		_selections = if (isArray(_textureSelectionIndex)) then {
 			getArray(_textureSelectionIndex)
 		} else {
@@ -275,24 +340,99 @@ VEMFSetupVic = {
 	};
 	
 	// Set Vehicle Init
-	_vehicle call EPOCH_server_vehicleInit;
-	
-	// Set a Random Fuel Amount
-	_ranFuel = random 1;
-	if (_ranFuel < 0.1) then {_ranFuel = 0.1;};
-	_vehicle setFuel _ranFuel;
-	_vehicle setVelocity [0,0,1];
-	_vehicle setDir (round(random 360));
-	
-	// If the Vehicle is Temporary, Warn Players
-	if (!(VEMFSaveVehicles)) then {
+	if (_temp) then {
 		_vehicle addEventHandler ["GetIn",{
-			_nil = ["Warning: Vehicle Will Disappear on Restart!","systemChat",(_this select 2),false,true] call BIS_fnc_MP;
+			VEMFWarnMessage = "Vehicle Will Disappear on Restart!";
+			(owner (_this select 2)) publicVariableClient "VEMFWarnMessage";
 		}];
+	} else {
+		_vehicle call EPOCH_server_vehicleInit;
 	};
 
 	true
-}; */
+};
+
+// Fills a Vehicle with AI
+VEMFFillVeh = {
+	private ["_vehicle","_addCargo","_safePos","_driver","_gunner","_cargo","_grp"];
+	
+	_vehicle = _this select 0;
+	_addCargo = _this select 1;
+	_safePos = (getpos _vehicle) findEmptyPosition [0,30,"I_Soldier_EPOCH"];
+	
+	// Add Driver
+	_driver = [_safePos] call VEMFSpawnSingleAI;
+	_driver moveInDriver _vehicle;
+	
+	// Add Gunner(s)
+	for "_i" from 1 to (_vehicle emptyPositions "Gunner") do {
+		_gunner = [_safePos] call VEMFSpawnSingleAI;
+		_gunner moveInGunner _vehicle;
+	};
+	
+	// Add Cargo Crew
+	if (_addCargo) then {
+		for "_i" from 1 to (_vehicle emptyPositions "Cargo") do {
+			_cargo = [_safePos] call VEMFSpawnSingleAI;
+			_cargo moveInCargo _vehicle;
+		};
+	};
+	
+	// Group Units in Vehicle
+	_grp = createGroup RESISTANCE;
+	_grp setBehaviour "SAFE";
+	_grp setCombatMode "YELLOW";
+	
+	{
+		[_x] joinSilent _grp;
+	} forEach (crew _vehicle);
+	
+	// Make Driver Leader
+	_driver setSkill 1;
+	_grp selectLeader _driver;
+	
+	// Return Group
+	_grp
+};
+
+// Random Fuel
+VEMFRanFuel = {
+	private ["_vehicle"];
+	
+	_vehicle = _this select 0;
+	
+	if (local _vehicle) then {
+		_ranFuel = random 1;
+		if (_ranFuel < 0.1) then {_ranFuel = 0.1;};
+		_vehicle setFuel _ranFuel;
+		_vehicle setVelocity [0,0,1];
+		_vehicle setDir (round(random 360));
+		
+		true
+	} else {
+		false
+	};
+};
+
+// Levels an Object to the Terrain (Mostly)
+// Code from KK
+VEMFLevel = {
+	private ["_vic"];
+
+	_vic = _this select 0;
+	
+	if (local _vic) then {
+		_sn = surfaceNormal visiblePositionASL _vic;
+		_k = abs (_sn vectorDotProduct vectorDirVisual _vic);
+		_vic setVectorUp (
+			(_sn vectorMultiply _k) vectorAdd (
+				[0,0,1] vectorMultiply (
+					sqrt (1 - (_sn vectorDotProduct [0,0,1]) ^ 2) - _k
+				)
+			)
+		);
+	};
+};
 
 // Loads a New AI Full of Gear
 VEMFLoadAIGear = {
@@ -390,12 +530,15 @@ VEMFLoadAIGear = {
 };
 
 VEMFLoadLoot = {
-	private ["_crate","_var","_tmp","_kindOf","_report","_cAmmo"];
+	private ["_crate","_delay","_var","_tmp","_kindOf","_report","_cAmmo"];
 	
 	_crate = _this select 0;
+	_delay = _this select 1;
 	
-	// Delay Cleanup
-	_crate setVariable ["LAST_CHECK", (diag_tickTime + 1800)];
+	if (_delay) then {
+		// Delay Cleanup
+		_crate setVariable ["LAST_CHECK", (diag_tickTime + 1800)];
+	};
 	
 	// Empty Crate
 	clearWeaponCargoGlobal _crate;
@@ -547,30 +690,73 @@ VEMFNearWait = {
 
 // Waits for the Mission to be Completed
 VEMFWaitMissComp = {
-    private ["_objective","_unitArrayName","_numSpawned","_numKillReq","_missDone"];
+    private ["_objective","_unitArrayName","_numSpawned","_numKillReq","_missDone","_reason"];
 	
     _objective = _this select 0;
     _unitArrayName = _this select 1;
+    
+    if (count _this > 2) then {
+		_target		= _this select 2;
+	} else {
+		_target 	= nil;
+	};
 	
-    call compile format["_numSpawned = count %1;",_unitArrayName];
-    _numKillReq = ceil(VEMFRequiredKillPercent * _numSpawned);
+	if (count _this > 3) then {
+		_destination = _this select 3;
+	};
 	
-	diag_log text format["[VEMF]: (%3) Waiting for %1/%2 Units or Less to be Alive and a Player to be Near the Objective.", (_numSpawned - _numKillReq), _numSpawned, _unitArrayName];
-	
-	_missDone = false;
-    call compile format["
-		while {true} do {
-			if (count %1 <= (_numSpawned - _numKillReq)) then {
-				if ((count(_objective nearEntities [['Epoch_Male_F', 'Epoch_Female_F'], 150])) > 0) then {
-					_missDone = true;
+	if (isNil "_target") then {
+
+		call compile format["_numSpawned = count %1;",_unitArrayName];
+		_numKillReq = ceil(VEMFRequiredKillPercent * _numSpawned);
+		
+		diag_log text format["[VEMF]: (%3) Waiting for %1/%2 Units or Less to be Alive and a Player to be Near the Objective.", (_numSpawned - _numKillReq), _numSpawned, _unitArrayName];
+		
+		_missDone = false;
+		call compile format["
+			while {true} do {
+				if (count %1 <= (_numSpawned - _numKillReq)) then {
+					if ((count(_objective nearEntities [['Epoch_Male_F', 'Epoch_Female_F'], 150])) > 0) then {
+						_missDone = true;
+					};
 				};
+				if (_missDone) exitWith {};
+				uiSleep 5;
 			};
-			if (_missDone) exitWith {};
-			uiSleep 5;
-		};
-	", _unitArrayName];
+		", _unitArrayName];
+		
+		diag_log text format ["[VEMF]: WaitMissComp: Waiting Over. %1 Completed.", _unitArrayName];
 	
-	diag_log text format ["[VEMF]: WaitMissComp: Waiting Over. %1 Completed.", _unitArrayName];
+	} else {
+	
+		call compile format["_numSpawned = count %1;",_unitArrayName];
+		_numKillReq = ceil(VEMFRequiredKillPercent * _numSpawned);
+		
+		diag_log text format["[VEMF]: (%3) Waiting for %1/%2 Units or Less to be Alive and a Player to be Near the Targets.", (_numSpawned - _numKillReq), _numSpawned, _unitArrayName];
+		
+		_missDone = false;
+		call compile format["
+			while {true} do {
+				if (count %1 <= (_numSpawned - _numKillReq)) then {
+					if ((count(_objective nearEntities [['Epoch_Male_F', 'Epoch_Female_F'], 150])) > 0) then {
+						_missDone = true;
+						_reason = 'was Killed.';
+						true
+					};
+				};
+				if (((getpos _target) distance _destination) <= 150) then {
+					_missDone = true;
+					_reason = 'Reached Destination.';
+					false
+				};
+				if (_missDone) exitWith {};
+				uiSleep 5;
+			};
+		", _unitArrayName];
+		
+		diag_log text format ["[VEMF]: WaitMissComp: Waiting Over. %1 %2", _unitArrayName, _reason];
+		
+	};
 };
 
 /* ================================= End Of Functions ================================= */
